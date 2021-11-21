@@ -27,10 +27,23 @@ func New(version string) func() *schema.Provider {
 	return func() *schema.Provider {
 		p := &schema.Provider{
 			DataSourcesMap: map[string]*schema.Resource{
-				"network_data_source": dataSourceNetwork(),
+				"netmaker_networks": dataSourceNetwork(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"network_resource": resourceScaffolding(),
+				"network_networks": resourceScaffolding(),
+			},
+			Schema: map[string]*schema.Schema{
+				"username": &schema.Schema{
+					Type:        schema.TypeString,
+					Optional:    true,
+					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_USERNAME", nil),
+				},
+				"password": &schema.Schema{
+					Type:        schema.TypeString,
+					Optional:    true,
+					Sensitive:   true,
+					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_PASSWORD", nil),
+				},
 			},
 		}
 
@@ -51,22 +64,21 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		// Setup a User-Agent for your API client (replace the provider name for yours):
 		// userAgent := p.UserAgent("terraform-provider-scaffolding", version)
 		// TODO: myClient.UserAgent = userAgent
-		// username := d.Get("username").(string)
-		// password := d.Get("password").(string)
+		username := d.Get("username").(string)
+		password := d.Get("password").(string)
 
-		// // Warning or errors can be collected in a slice type
-		// var diags diag.Diagnostics
-		// netmaker := Netmaker{}
-		// if (username != "") && (password != "") {
-		// 	c, err := netmaker.NewClient(nil, &username, &password)
-		// 	if err != nil {
-		// 		return nil, diag.FromErr(err)
-		// 	}
+		// Warning or errors can be collected in a slice type
+		var diags diag.Diagnostics
+		if (username != "") && (password != "") {
+			c, err := NewClient(nil, &username, &password)
+			if err != nil {
+				return nil, diag.FromErr(err)
+			}
 
-		// 	return c, diags
-		// }
+			return c, diags
+		}
 
-		// c, err := netmaker.NewClient(nil, nil, nil)
+		// c, err := NewClient(nil, nil, nil)
 		// if err != nil {
 		// 	return nil, diag.FromErr(err)
 		// }
