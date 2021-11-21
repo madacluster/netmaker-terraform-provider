@@ -27,10 +27,10 @@ func New(version string) func() *schema.Provider {
 	return func() *schema.Provider {
 		p := &schema.Provider{
 			DataSourcesMap: map[string]*schema.Resource{
-				"scaffolding_data_source": dataSourceScaffolding(),
+				"network_data_source": dataSourceNetwork(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"scaffolding_resource": resourceScaffolding(),
+				"network_resource": resourceScaffolding(),
 			},
 		}
 
@@ -47,10 +47,29 @@ type apiClient struct {
 }
 
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
-	return func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		// Setup a User-Agent for your API client (replace the provider name for yours):
 		// userAgent := p.UserAgent("terraform-provider-scaffolding", version)
 		// TODO: myClient.UserAgent = userAgent
+		// username := d.Get("username").(string)
+		// password := d.Get("password").(string)
+
+		// // Warning or errors can be collected in a slice type
+		// var diags diag.Diagnostics
+		// netmaker := Netmaker{}
+		// if (username != "") && (password != "") {
+		// 	c, err := netmaker.NewClient(nil, &username, &password)
+		// 	if err != nil {
+		// 		return nil, diag.FromErr(err)
+		// 	}
+
+		// 	return c, diags
+		// }
+
+		// c, err := netmaker.NewClient(nil, nil, nil)
+		// if err != nil {
+		// 	return nil, diag.FromErr(err)
+		// }
 
 		return &apiClient{}, nil
 	}
