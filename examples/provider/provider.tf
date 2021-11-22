@@ -1,3 +1,3 @@
-provider "scaffolding" {
+provider "netmaker" {
   # example configuration here
 }

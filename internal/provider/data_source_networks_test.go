@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourceScaffolding(t *testing.T) {
+func TestAccDataSourceNetworks(t *testing.T) {
 	t.Skip("data source not yet implemented, remove this once you add your own code")
 
 	resource.UnitTest(t, resource.TestCase{
@@ -15,7 +15,7 @@ func TestAccDataSourceScaffolding(t *testing.T) {
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceScaffolding,
+				Config: testAccDataSourceNetworks,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"data.netmaker_networks.foo", "networks", regexp.MustCompile("^ba")),
@@ -25,7 +25,7 @@ func TestAccDataSourceScaffolding(t *testing.T) {
 	})
 }
 
-const testAccDataSourceScaffolding = `
+const testAccDataSourceNetworks = `
 data "netmaker_networks" "foo" {
 	networks = "bar"
 }
