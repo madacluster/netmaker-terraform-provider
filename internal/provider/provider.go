@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	client "github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
 func init() {
@@ -33,16 +34,22 @@ func New(version string) func() *schema.Provider {
 				"network_networks": resourceScaffolding(),
 			},
 			Schema: map[string]*schema.Schema{
-				"username": &schema.Schema{
+				"username": {
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_USERNAME", nil),
 				},
-				"password": &schema.Schema{
+				"password": {
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					Sensitive:   true,
 					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_PASSWORD", nil),
+				},
+				"host": {
+					Type:        schema.TypeString,
+					Required:    true,
+					Sensitive:   true,
+					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_HOST", nil),
 				},
 			},
 		}
@@ -66,11 +73,12 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		// TODO: myClient.UserAgent = userAgent
 		username := d.Get("username").(string)
 		password := d.Get("password").(string)
+		host := d.Get("host").(string)
 
 		// Warning or errors can be collected in a slice type
 		var diags diag.Diagnostics
-		if (username != "") && (password != "") {
-			c, err := NewClient(nil, &username, &password)
+		if (username != "") && (password != "") && (host != "") {
+			c, err := client.NewClient(&host, &username, &password)
 			if err != nil {
 				return nil, diag.FromErr(err)
 			}
