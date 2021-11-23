@@ -20,16 +20,16 @@ func dataSourceNetwork() *schema.Resource {
 		ReadContext: dataSourceNetworkRead,
 
 		Schema: map[string]*schema.Schema{
-			"networks": &schema.Schema{
+			"networks": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"netid": &schema.Schema{
+						"netid": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"addressrange": &schema.Schema{
+						"addressrange": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
@@ -61,7 +61,6 @@ func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 	defer r.Body.Close()
-	fmt.Println(r.StatusCode)
 	networks := make([]map[string]interface{}, 0)
 	err = json.NewDecoder(r.Body).Decode(&networks)
 	if err != nil {
