@@ -2,14 +2,12 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
 func dataSourceNetwork() *schema.Resource {
@@ -24,16 +22,7 @@ func dataSourceNetwork() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"netid": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"addressrange": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
+					Schema: helper.CreateNetworkSchema(),
 				},
 			},
 		},
@@ -42,32 +31,22 @@ func dataSourceNetwork() *schema.Resource {
 
 func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
-	// client := meta.(*apiClient)
+	client := meta.(*helper.Client)
 
 	// idFromAPI := "my-id"
 	// d.SetId(idFromAPI)
-	client := &http.Client{Timeout: 10 * time.Second}
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/networks", "https://api.netmaker.madacluster.tech"), nil)
+	networks, err := client.GetNetworks()
+	networksFlatten := helper.FlattenOrderItemsData(&networks)
+
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	r, err := client.Do(req)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	defer r.Body.Close()
-	networks := make([]map[string]interface{}, 0)
-	err = json.NewDecoder(r.Body).Decode(&networks)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := d.Set("networks", networks); err != nil {
+	if err := d.Set("networks", networksFlatten); err != nil {
 		return diag.FromErr(err)
 	}
 

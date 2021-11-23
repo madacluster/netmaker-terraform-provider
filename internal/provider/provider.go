@@ -60,12 +60,6 @@ func New(version string) func() *schema.Provider {
 	}
 }
 
-type apiClient struct {
-	// Add whatever fields, client or connection info, etc. here
-	// you would need to setup to communicate with the upstream
-	// API.
-}
-
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		// Setup a User-Agent for your API client (replace the provider name for yours):
@@ -80,17 +74,25 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		if (username != "") && (password != "") && (host != "") {
 			c, err := client.NewClient(&host, &username, &password)
 			if err != nil {
-				return nil, diag.FromErr(err)
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  "Unable to create HashiCups client",
+					Detail:   "Unable to auth user for authenticated HashiCups client",
+				})
 			}
 
 			return c, diags
 		}
 
-		// c, err := NewClient(nil, nil, nil)
-		// if err != nil {
-		// 	return nil, diag.FromErr(err)
-		// }
+		c, err := client.NewClient(nil, nil, nil)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Unable to create HashiCups client",
+				Detail:   "Unable to auth user for authenticated HashiCups client",
+			})
+		}
 
-		return &apiClient{}, nil
+		return c, diags
 	}
 }

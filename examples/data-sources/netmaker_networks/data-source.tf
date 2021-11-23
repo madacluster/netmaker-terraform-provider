@@ -16,3 +16,7 @@ provider "netmaker" {
 data "netmaker_networks" "example" {
   # sample_attribute = "foo"
 }
+
+output "networks" {
+  value = "${data.netmaker_networks.example.networks}"
+}
