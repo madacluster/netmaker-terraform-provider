@@ -50,6 +50,6 @@ autolabeler:
     title:
       - "/Bump/i"
 template: |
-  ## Changes
+    ## Changes
 
-  $CHANGES
+    $CHANGES
