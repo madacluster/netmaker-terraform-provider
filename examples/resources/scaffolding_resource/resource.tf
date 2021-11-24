@@ -1,3 +1,3 @@
-resource "scaffolding_resource" "example" {
+resource "netmaker_networks" "example" {
   sample_attribute = "foo"
 }

@@ -1,18 +1,18 @@
 ---
-page_title: "scaffolding_resource Resource - terraform-provider-scaffolding"
+page_title: "netmaker_networks Resource - terraform-provider-netmaker"
 subcategory: ""
 description: |-
-  Sample resource in the Terraform provider scaffolding.
+  Sample resource in the Terraform provider netmaker.
 ---
 
-# Resource `scaffolding_resource`
+# Resource `netmaker_networks`
 
-Sample resource in the Terraform provider scaffolding.
+Sample resource in the Terraform provider netmaker.
 
 ## Example Usage
 
 ```terraform
-resource "scaffolding_resource" "example" {
+resource "netmaker_networks" "example" {
   sample_attribute = "foo"
 }
 ```

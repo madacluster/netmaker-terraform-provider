@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	client "github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
 func init() {
@@ -27,22 +28,29 @@ func New(version string) func() *schema.Provider {
 	return func() *schema.Provider {
 		p := &schema.Provider{
 			DataSourcesMap: map[string]*schema.Resource{
-				"netmaker_networks": dataSourceNetwork(),
+				"netmaker_networks": dataSourceNetworks(),
+				"netmaker_network":  dataSourceNetwork(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"network_networks": resourceScaffolding(),
+				"netmaker_network": resourceNetwork(),
 			},
 			Schema: map[string]*schema.Schema{
-				"username": &schema.Schema{
+				"username": {
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_USERNAME", nil),
 				},
-				"password": &schema.Schema{
+				"password": {
 					Type:        schema.TypeString,
-					Optional:    true,
+					Required:    true,
 					Sensitive:   true,
 					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_PASSWORD", nil),
+				},
+				"host": {
+					Type:        schema.TypeString,
+					Required:    true,
+					Sensitive:   true,
+					DefaultFunc: schema.EnvDefaultFunc("NETMAKER_HOST", nil),
 				},
 			},
 		}
@@ -53,12 +61,6 @@ func New(version string) func() *schema.Provider {
 	}
 }
 
-type apiClient struct {
-	// Add whatever fields, client or connection info, etc. here
-	// you would need to setup to communicate with the upstream
-	// API.
-}
-
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		// Setup a User-Agent for your API client (replace the provider name for yours):
@@ -66,23 +68,32 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		// TODO: myClient.UserAgent = userAgent
 		username := d.Get("username").(string)
 		password := d.Get("password").(string)
+		host := d.Get("host").(string)
 
 		// Warning or errors can be collected in a slice type
 		var diags diag.Diagnostics
-		if (username != "") && (password != "") {
-			c, err := NewClient(nil, &username, &password)
+		if (username != "") && (password != "") && (host != "") {
+			c, err := client.NewClient(&host, &username, &password)
 			if err != nil {
-				return nil, diag.FromErr(err)
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  "Unable to create HashiCups client",
+					Detail:   "Unable to auth user for authenticated HashiCups client",
+				})
 			}
 
 			return c, diags
 		}
 
-		// c, err := NewClient(nil, nil, nil)
-		// if err != nil {
-		// 	return nil, diag.FromErr(err)
-		// }
+		c, err := client.NewClient(nil, nil, nil)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Unable to create HashiCups client",
+				Detail:   "Unable to auth user for authenticated HashiCups client",
+			})
+		}
 
-		return &apiClient{}, nil
+		return c, diags
 	}
 }

@@ -1,18 +1,18 @@
 ---
-page_title: "scaffolding Provider"
+page_title: "Netmaker Provider"
 subcategory: ""
 description: |-
   
 ---
 
-# scaffolding Provider
+# Netmaker Provider
 
 
 
 ## Example Usage
 
 ```terraform
-provider "scaffolding" {
+provider "netmaker" {
   # example configuration here
 }
 ```

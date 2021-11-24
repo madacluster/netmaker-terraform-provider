@@ -1,18 +1,18 @@
 ---
-page_title: "scaffolding_data_source Data Source - terraform-provider-scaffolding"
+page_title: "Network data soutce - terraform-provider-netmaker"
 subcategory: ""
 description: |-
-  Sample data source in the Terraform provider scaffolding.
+  Sample data source in the Terraform provider Netmaker.
 ---
 
-# Data Source `scaffolding_data_source`
+# Data Source `netmaker_networks`
 
-Sample data source in the Terraform provider scaffolding.
+Sample data source in the netmaker Terraform provider.
 
 ## Example Usage
 
 ```terraform
-data "scaffolding_data_source" "example" {
+data "netmaker_networks" "example" {
   sample_attribute = "foo"
 }
 ```
