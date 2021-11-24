@@ -109,9 +109,8 @@ func (c *Client) CreateNetwork(network Network) (*Network, error) {
 }
 
 // UpdateNetwork - Updates a network
-func (c *Client) UpdateNetwork(data map[string]string) (*Network, error) {
-	network := Network{}
-	mapFiels(data, &network)
+func (c *Client) UpdateNetwork(network Network) (*Network, error) {
+
 	rb, err := json.Marshal(network)
 	if err != nil {
 		return nil, err
@@ -132,6 +131,17 @@ func (c *Client) UpdateNetwork(data map[string]string) (*Network, error) {
 	}
 
 	return &network, nil
+}
+
+func (c *Client) UpdateNetworkFromSchema(d *schema.ResourceData) (*Network, error) {
+	network := CreateNetworkFromSchemaData(d)
+	return c.UpdateNetwork(*network)
+}
+
+func (c *Client) UpdateNetworkMap(data map[string]string) (*Network, error) {
+	network := Network{}
+	mapFiels(data, &network)
+	return c.UpdateNetwork(network)
 }
 
 func (c *Client) DeleteNetwork(networkID string) error {

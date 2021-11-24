@@ -248,7 +248,7 @@ func TestClient_UpdateNetwork(t *testing.T) {
 			}
 
 			networkFieldMap := mapFielsRevert(network)
-			got, err := c.UpdateNetwork(networkFieldMap)
+			got, err := c.UpdateNetworkMap(networkFieldMap)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.UpdateNetwork() error = %v, wantErr %v", err, tt.wantErr)
 				return

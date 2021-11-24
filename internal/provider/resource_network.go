@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -26,7 +27,7 @@ func resourceNetwork() *schema.Resource {
 		CreateContext: resourceNetworkCreate,
 		ReadContext:   resourceNetworkRead,
 		UpdateContext: resourceNetworkUpdate,
-		DeleteContext: resourceScaffoldingDelete,
+		DeleteContext: resourceNetworkDelete,
 
 		Schema: addLastupdated(),
 	}
@@ -72,21 +73,34 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta inter
 func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
-	networkID := d.Id()
-	if d.HasChange("addressrange") {
-		name := d.Get("addressrange").(string)
-		err := client.UpdateNetworkName(networkID, name)
+	// networkID := d.Id()
+	if d.HasChangesExcept("last_updated") {
+		_, err := client.UpdateNetworkFromSchema(d)
 		if err != nil {
 			return diag.FromErr(err)
 		}
+		d.Set("last_updated", time.Now().Format(time.RFC850))
+
 	}
 
-	return diag.Errorf("not implemented")
+	return resourceNetworkRead(ctx, d, meta)
 }
 
 func resourceNetworkDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	// client := meta.(*apiClient)
+	client := meta.(*helper.Client)
+	var diags diag.Diagnostics
 
-	return diag.Errorf("not implemented")
+	networkID := d.Id()
+	err := client.DeleteNetwork(networkID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	// d.SetId("") is automatically called assuming delete returns no errors, but
+	// it is added here for explicitness.
+	d.SetId("")
+
+	return diags
 }
