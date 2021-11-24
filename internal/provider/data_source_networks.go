@@ -10,12 +10,12 @@ import (
 	"github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
-func dataSourceNetwork() *schema.Resource {
+func dataSourceNetworks() *schema.Resource {
 	return &schema.Resource{
 		// This description is used by the documentation generator and the language server.
 		Description: "Network Data source in the Terraform provider Netmaker.",
 
-		ReadContext: dataSourceNetworkRead,
+		ReadContext: dataSourceNetworksRead,
 
 		Schema: map[string]*schema.Schema{
 			"networks": {
@@ -29,7 +29,7 @@ func dataSourceNetwork() *schema.Resource {
 	}
 }
 
-func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceNetworksRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
 
