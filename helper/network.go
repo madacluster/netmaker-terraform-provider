@@ -340,45 +340,105 @@ func CreateNetworkSchema() map[string]*schema.Schema {
 
 }
 
-func FlattenOrderItemsData(networks *[]Network) []interface{} {
+func SetNetworkSchemaData(d *schema.ResourceData, network *Network) error {
+	if err := d.Set("netid", network.Netid); err != nil {
+		return err
+	}
+	if err := d.Set("addressrange", network.Addressrange); err != nil {
+		return err
+	}
+	if err := d.Set("addressrange6", network.Addressrange6); err != nil {
+		return err
+	}
+	if err := d.Set("displayname", network.Displayname); err != nil {
+		return err
+	}
+	if err := d.Set("islocal", network.Islocal); err != nil {
+		return err
+	}
+	if err := d.Set("isdualstack", network.Isdualstack); err != nil {
+		return err
+	}
+	if err := d.Set("isipv4", network.Isipv4); err != nil {
+		return err
+	}
+	if err := d.Set("isipv6", network.Isipv6); err != nil {
+		return err
+	}
+	if err := d.Set("isgrpchub", network.Isgrpchub); err != nil {
+		return err
+	}
+	if err := d.Set("localrange", network.Localrange); err != nil {
+		return err
+	}
+	if err := d.Set("checkininterval", network.Checkininterval); err != nil {
+		return err
+	}
+
+	if err := d.Set("defaultudpholepunch", network.Defaultudpholepunch); err != nil {
+		return err
+	}
+	if err := d.Set("defaultextclientdns", network.Defaultextclientdns); err != nil {
+		return err
+	}
+	if err := d.Set("defaultmtu", network.Defaultmtu); err != nil {
+		return err
+	}
+	if err := d.Set("defaultkeepalive", network.Defaultkeepalive); err != nil {
+		return err
+	}
+	if err := d.Set("allowmanualsignup", network.Allowmanualsignup); err != nil {
+		return err
+	}
+	if err := d.Set("nodeslastmodified", network.Nodeslastmodified); err != nil {
+		return err
+	}
+	return nil
+}
+
+func FlattenNetworkData(network *Network) map[string]interface{} {
+	oi := make(map[string]interface{})
+	oi["netid"] = network.Netid
+	oi["addressrange"] = network.Addressrange
+	oi["addressrange6"] = network.Addressrange6
+	oi["displayname"] = network.Displayname
+	oi["islocal"] = network.Islocal
+	oi["isdualstack"] = network.Isdualstack
+	oi["isipv4"] = network.Isipv4
+	oi["isipv6"] = network.Isipv6
+	oi["isgrpchub"] = network.Isgrpchub
+	oi["localrange"] = network.Localrange
+	oi["checkininterval"] = network.Checkininterval
+	oi["nodeslastmodified"] = network.Nodeslastmodified
+	oi["networklastmodified"] = network.Networklastmodified
+	oi["defaultinterface"] = network.Defaultinterface
+	oi["defaultlistenport"] = network.Defaultlistenport
+	oi["nodelimit"] = network.Nodelimit
+	oi["defaultpostup"] = network.Defaultpostup
+	oi["defaultpostdown"] = network.Defaultpostdown
+	oi["keyupdatetimestamp"] = network.Keyupdatetimestamp
+	oi["defaultsaveconfig"] = network.Defaultsaveconfig
+	oi["defaultmtu"] = network.Defaultmtu
+	oi["defaultkeepalive"] = network.Defaultkeepalive
+	oi["allowmanualsignup"] = network.Allowmanualsignup
+	oi["defaultudpholepunch"] = network.Defaultudpholepunch
+	oi["defaultextclientdns"] = network.Defaultextclientdns
+	oi["islocal"] = network.Islocal
+	oi["isdualstack"] = network.Isdualstack
+	oi["isipv4"] = network.Isipv4
+	oi["isipv6"] = network.Isipv6
+	oi["isgrpchub"] = network.Isgrpchub
+	oi["localrange"] = network.Localrange
+	oi["checkininterval"] = network.Checkininterval
+
+	return oi
+}
+
+func FlattenNetworksData(networks *[]Network) []interface{} {
 	if networks != nil {
 		ois := make([]interface{}, len(*networks))
 		for i, network := range *networks {
-			oi := make(map[string]interface{})
-			oi["netid"] = network.Netid
-			oi["addressrange"] = network.Addressrange
-			oi["addressrange6"] = network.Addressrange6
-			oi["displayname"] = network.Displayname
-			oi["islocal"] = network.Islocal
-			oi["isdualstack"] = network.Isdualstack
-			oi["isipv4"] = network.Isipv4
-			oi["isipv6"] = network.Isipv6
-			oi["isgrpchub"] = network.Isgrpchub
-			oi["localrange"] = network.Localrange
-			oi["checkininterval"] = network.Checkininterval
-			oi["nodeslastmodified"] = network.Nodeslastmodified
-			oi["networklastmodified"] = network.Networklastmodified
-			oi["defaultinterface"] = network.Defaultinterface
-			oi["defaultlistenport"] = network.Defaultlistenport
-			oi["nodelimit"] = network.Nodelimit
-			oi["defaultpostup"] = network.Defaultpostup
-			oi["defaultpostdown"] = network.Defaultpostdown
-			oi["keyupdatetimestamp"] = network.Keyupdatetimestamp
-			oi["defaultsaveconfig"] = network.Defaultsaveconfig
-			oi["defaultmtu"] = network.Defaultmtu
-			oi["defaultkeepalive"] = network.Defaultkeepalive
-			oi["allowmanualsignup"] = network.Allowmanualsignup
-			oi["defaultudpholepunch"] = network.Defaultudpholepunch
-			oi["defaultextclientdns"] = network.Defaultextclientdns
-			oi["islocal"] = network.Islocal
-			oi["isdualstack"] = network.Isdualstack
-			oi["isipv4"] = network.Isipv4
-			oi["isipv6"] = network.Isipv6
-			oi["isgrpchub"] = network.Isgrpchub
-			oi["localrange"] = network.Localrange
-			oi["checkininterval"] = network.Checkininterval
-
-			ois[i] = oi
+			ois[i] = FlattenNetworkData(&network)
 		}
 
 		return ois
