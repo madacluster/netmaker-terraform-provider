@@ -15,7 +15,7 @@ func TestAccResourceNetwork(t *testing.T) {
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccResourceScaffolding,
+				Config: testAccResourceNetwork,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"netmaker_network.foo", "netid", regexp.MustCompile("^netmakertest")),
@@ -25,7 +25,7 @@ func TestAccResourceNetwork(t *testing.T) {
 	})
 }
 
-const testAccResourceScaffolding = `
+const testAccResourceNetwork = `
 provider "netmaker" {
 	username = "admin"
 	password = "mx4S6JsSg7JWcZ"
