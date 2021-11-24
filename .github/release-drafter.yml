@@ -49,7 +49,5 @@ autolabeler:
   - label: 'dependency'
     title:
       - "/Bump/i"
-template: |+
-    ## Changes
-
-    $CHANGES
+template: "## Changes\n $CHANGES"
+    
