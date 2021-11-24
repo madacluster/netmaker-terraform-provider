@@ -62,7 +62,7 @@ func (c *Client) GetNetworks() ([]Network, error) {
 	return networks, nil
 }
 
-// GetNetworks - Returns list of coffees (no auth required)
+// GetNetworks - Returns a network by ID
 func (c *Client) GetNetwork(networkID string) (*Network, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/networks/%s", c.HostURL, networkID), nil)
@@ -83,11 +83,15 @@ func (c *Client) GetNetwork(networkID string) (*Network, error) {
 	return &network, nil
 }
 
-// GetNetworks - Returns list of coffees (no auth required)
-func (c *Client) CreateNetwork(networkID, addressrange string) (*Network, error) {
+// GetNetworks - Create a new network
+func (c *Client) CreateNetwork(networkID, addressrange, addressrange6, localrange, islocal, isdualstack, defaultudpholepunch string) (*Network, error) {
 	network := Network{
-		Addressrange: addressrange,
-		Netid:        networkID,
+		Addressrange:        addressrange,
+		Netid:               networkID,
+		Localrange:          localrange,
+		Islocal:             islocal,
+		Isdualstack:         isdualstack,
+		Defaultudpholepunch: defaultudpholepunch,
 	}
 	rb, err := json.Marshal(network)
 	if err != nil {
@@ -338,6 +342,36 @@ func CreateNetworkSchema() map[string]*schema.Schema {
 		},
 	}
 
+}
+
+func CreateNetworkFromSchemaData(d *schema.ResourceData) *Network {
+	network := &Network{}
+	network.Netid = d.Get("netid").(string)
+	network.Addressrange = d.Get("addressrange").(string)
+	network.Addressrange6 = d.Get("addressrange6").(string)
+	network.Displayname = d.Get("displayname").(string)
+	network.Islocal = d.Get("islocal").(string)
+	network.Isdualstack = d.Get("isdualstack").(string)
+	network.Isipv4 = d.Get("isipv4").(string)
+	network.Isipv6 = d.Get("isipv6").(string)
+	network.Isgrpchub = d.Get("isgrpchub").(string)
+	network.Localrange = d.Get("localrange").(string)
+	network.Checkininterval = d.Get("checkininterval").(int64)
+	network.Defaultudpholepunch = d.Get("defaultudpholepunch").(string)
+	network.Defaultextclientdns = d.Get("defaultextclientdns").(string)
+	network.Defaultmtu = d.Get("defaultmtu").(int64)
+	network.Defaultkeepalive = d.Get("defaultkeepalive").(int64)
+	network.Allowmanualsignup = d.Get("allowmanualsignup").(string)
+	network.Nodeslastmodified = d.Get("nodeslastmodified").(int64)
+	network.Networklastmodified = d.Get("networklastmodified").(int64)
+	network.Defaultinterface = d.Get("defaultinterface").(string)
+	network.Defaultlistenport = d.Get("defaultlistenport").(int64)
+	network.Defaultsaveconfig = d.Get("defaultsaveconfig").(string)
+	network.Nodelimit = d.Get("nodelimit").(int64)
+	network.Defaultpostup = d.Get("defaultpostup").(string)
+	network.Defaultpostdown = d.Get("defaultpostdown").(string)
+	network.Keyupdatetimestamp = d.Get("keyupdatetimestamp").(int64)
+	return network
 }
 
 func SetNetworkSchemaData(d *schema.ResourceData, network *Network) error {
