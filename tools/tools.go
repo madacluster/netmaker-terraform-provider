@@ -5,4 +5,6 @@ package tools
 
 // document generation
 
-// _ "github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs"
+import (
+	_ "github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs"
+)
