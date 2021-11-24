@@ -2,13 +2,15 @@ package provider
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
-func addId() map[string]*schema.Schema {
+func AddIdNetworkSchema() map[string]*schema.Schema {
 	networkSchema := helper.CreateNetworkSchema()
 	networkSchema["id"] = &schema.Schema{
 		Type:     schema.TypeString,
@@ -24,7 +26,7 @@ func dataSourceNetwork() *schema.Resource {
 
 		ReadContext: dataSourceNetworkRead,
 
-		Schema: addId(),
+		Schema: AddIdNetworkSchema(),
 	}
 }
 
@@ -48,7 +50,7 @@ func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta int
 		return diag.FromErr(err)
 	}
 	// always run
-	d.SetId(networkID)
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return diags
 }
