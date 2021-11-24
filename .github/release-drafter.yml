@@ -49,7 +49,7 @@ autolabeler:
   - label: 'dependency'
     title:
       - "/Bump/i"
-template: |
+template: |+
     ## Changes
 
     $CHANGES
