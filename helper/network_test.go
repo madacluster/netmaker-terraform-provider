@@ -67,7 +67,16 @@ func TestClient_CreateNetwork(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, _ := NewClient(&tt.fields.HostURL, &tt.fields.Auth.Username, &tt.fields.Auth.Password)
-			got, err := c.CreateNetwork(tt.args.networkID, tt.args.addressrange, tt.args.addressrange6, tt.args.localrange, tt.args.islocal, tt.args.isdualstack, tt.args.defaultudpholepunch)
+			network := &Network{
+				Addressrange:        tt.args.addressrange,
+				Localrange:          tt.args.localrange,
+				Islocal:             tt.args.islocal,
+				Isdualstack:         tt.args.isdualstack,
+				Addressrange6:       tt.args.addressrange6,
+				Defaultudpholepunch: tt.args.defaultudpholepunch,
+				Netid:               tt.args.networkID,
+			}
+			got, err := c.CreateNetwork(*network)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateNetwork() error = %v, wantErr %v", err, tt.wantErr)
 				return

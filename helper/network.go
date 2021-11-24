@@ -17,15 +17,15 @@ type Network struct {
 	Addressrange6       string        `json:"addressrange6"`
 	Displayname         string        `json:"displayname"`
 	Netid               string        `json:"netid"`
-	Nodeslastmodified   int64         `json:"nodeslastmodified"`
-	Networklastmodified int64         `json:"networklastmodified"`
+	Nodeslastmodified   int           `json:"nodeslastmodified"`
+	Networklastmodified int           `json:"networklastmodified"`
 	Defaultinterface    string        `json:"defaultinterface"`
-	Defaultlistenport   int64         `json:"defaultlistenport"`
-	Nodelimit           int64         `json:"nodelimit"`
+	Defaultlistenport   int           `json:"defaultlistenport"`
+	Nodelimit           int           `json:"nodelimit"`
 	Defaultpostup       string        `json:"defaultpostup"`
 	Defaultpostdown     string        `json:"defaultpostdown"`
-	Keyupdatetimestamp  int64         `json:"keyupdatetimestamp"`
-	Defaultkeepalive    int64         `json:"defaultkeepalive"`
+	Keyupdatetimestamp  int           `json:"keyupdatetimestamp"`
+	Defaultkeepalive    int           `json:"defaultkeepalive"`
 	Defaultsaveconfig   string        `json:"defaultsaveconfig"`
 	Accesskeys          []interface{} `json:"accesskeys"`
 	Allowmanualsignup   string        `json:"allowmanualsignup"`
@@ -35,10 +35,10 @@ type Network struct {
 	Isipv6              string        `json:"isipv6"`
 	Isgrpchub           string        `json:"isgrpchub"`
 	Localrange          string        `json:"localrange"`
-	Checkininterval     int64         `json:"checkininterval"`
+	Checkininterval     int           `json:"checkininterval"`
 	Defaultudpholepunch string        `json:"defaultudpholepunch"`
 	Defaultextclientdns string        `json:"defaultextclientdns"`
-	Defaultmtu          int64         `json:"defaultmtu"`
+	Defaultmtu          int           `json:"defaultmtu"`
 }
 
 // GetNetworks - Returns list of coffees (no auth required)
@@ -83,16 +83,14 @@ func (c *Client) GetNetwork(networkID string) (*Network, error) {
 	return &network, nil
 }
 
+func (c *Client) CreateNetworkFromSchema(d *schema.ResourceData) (*Network, error) {
+	network := CreateNetworkFromSchemaData(d)
+	return c.CreateNetwork(*network)
+}
+
 // GetNetworks - Create a new network
-func (c *Client) CreateNetwork(networkID, addressrange, addressrange6, localrange, islocal, isdualstack, defaultudpholepunch string) (*Network, error) {
-	network := Network{
-		Addressrange:        addressrange,
-		Netid:               networkID,
-		Localrange:          localrange,
-		Islocal:             islocal,
-		Isdualstack:         isdualstack,
-		Defaultudpholepunch: defaultudpholepunch,
-	}
+func (c *Client) CreateNetwork(network Network) (*Network, error) {
+
 	rb, err := json.Marshal(network)
 	if err != nil {
 		return nil, err
@@ -173,37 +171,37 @@ func mapFiels(data map[string]string, network *Network) {
 			network.Localrange = v
 		case "checkininterval":
 			i, _ := strconv.Atoi(v)
-			network.Checkininterval = int64(i)
+			network.Checkininterval = i
 		case "defaultudpholepunch":
 			network.Defaultudpholepunch = v
 		case "defaultextclientdns":
 			network.Defaultextclientdns = v
 		case "defaultmtu":
 			i, _ := strconv.Atoi(v)
-			network.Defaultmtu = int64(i)
+			network.Defaultmtu = i
 		case "defaultkeepalive":
 			i, _ := strconv.Atoi(v)
-			network.Defaultkeepalive = int64(i)
+			network.Defaultkeepalive = i
 		case "allowmanualsignup":
 			network.Allowmanualsignup = v
 		case "nodeslastmodified":
-			network.Nodeslastmodified, _ = strconv.ParseInt(v, 10, 64)
+			network.Nodeslastmodified, _ = strconv.Atoi(v)
 		case "networklastmodified":
-			network.Networklastmodified, _ = strconv.ParseInt(v, 10, 64)
+			network.Networklastmodified, _ = strconv.Atoi(v)
 		case "defaultinterface":
 			network.Defaultinterface = v
 		case "defaultlistenport":
-			network.Defaultlistenport, _ = strconv.ParseInt(v, 10, 64)
+			network.Defaultlistenport, _ = strconv.Atoi(v)
 		case "defaultsaveconfig":
 			network.Defaultsaveconfig = v
 		case "nodelimit":
-			network.Nodelimit, _ = strconv.ParseInt(v, 10, 64)
+			network.Nodelimit, _ = strconv.Atoi(v)
 		case "defaultpostup":
 			network.Defaultpostup = v
 		case "defaultpostdown":
 			network.Defaultpostdown = v
 		case "keyupdatetimestamp":
-			network.Keyupdatetimestamp, _ = strconv.ParseInt(v, 10, 64)
+			network.Keyupdatetimestamp, _ = strconv.Atoi(v)
 		}
 	}
 }
@@ -213,17 +211,17 @@ func mapFielsRevert(network *Network) map[string]string {
 	data["displayname"] = network.Displayname
 	data["addressrange"] = network.Addressrange
 	data["netid"] = network.Netid
-	data["nodeslastmodified"] = strconv.FormatInt(network.Nodeslastmodified, 10)
-	data["networklastmodified"] = strconv.FormatInt(network.Networklastmodified, 10)
+	data["nodeslastmodified"] = strconv.Itoa(network.Nodeslastmodified)
+	data["networklastmodified"] = strconv.Itoa(network.Networklastmodified)
 	data["defaultinterface"] = network.Defaultinterface
-	data["defaultlistenport"] = strconv.FormatInt(network.Defaultlistenport, 10)
-	data["nodelimit"] = strconv.FormatInt(network.Nodelimit, 10)
+	data["defaultlistenport"] = strconv.Itoa(network.Defaultlistenport)
+	data["nodelimit"] = strconv.Itoa(network.Nodelimit)
 	data["defaultpostup"] = network.Defaultpostup
 	data["defaultpostdown"] = network.Defaultpostdown
-	data["keyupdatetimestamp"] = strconv.FormatInt(network.Keyupdatetimestamp, 10)
+	data["keyupdatetimestamp"] = strconv.Itoa(network.Keyupdatetimestamp)
 	data["defaultsaveconfig"] = network.Defaultsaveconfig
-	data["defaultmtu"] = strconv.FormatInt(network.Defaultmtu, 10)
-	data["defaultkeepalive"] = strconv.FormatInt(network.Defaultkeepalive, 10)
+	data["defaultmtu"] = strconv.Itoa(network.Defaultmtu)
+	data["defaultkeepalive"] = strconv.Itoa(network.Defaultkeepalive)
 	data["allowmanualsignup"] = network.Allowmanualsignup
 	data["defaultudpholepunch"] = network.Defaultudpholepunch
 	data["defaultextclientdns"] = network.Defaultextclientdns
@@ -233,7 +231,7 @@ func mapFielsRevert(network *Network) map[string]string {
 	data["isIPv6"] = network.Isipv6
 	data["isGRPCHub"] = network.Isgrpchub
 	data["localrange"] = network.Localrange
-	data["checkininterval"] = strconv.FormatInt(network.Checkininterval, 10)
+	data["checkininterval"] = strconv.Itoa(network.Checkininterval)
 	return data
 }
 
@@ -241,11 +239,11 @@ func CreateNetworkSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"netid": {
 			Type:     schema.TypeString,
-			Computed: true,
+			Required: true,
 		},
 		"addressrange": {
 			Type:     schema.TypeString,
-			Computed: true,
+			Required: true,
 		},
 		"addressrange6": {
 			Type:     schema.TypeString,
@@ -258,10 +256,12 @@ func CreateNetworkSchema() map[string]*schema.Schema {
 		"islocal": {
 			Type:     schema.TypeString,
 			Computed: true,
+			Default:  nil,
 		},
 		"isdualstack": {
 			Type:     schema.TypeString,
 			Computed: true,
+			Default:  nil,
 		},
 		"isipv4": {
 			Type:     schema.TypeString,
@@ -287,6 +287,7 @@ func CreateNetworkSchema() map[string]*schema.Schema {
 		"defaultudpholepunch": {
 			Type:     schema.TypeString,
 			Computed: true,
+			Default:  nil,
 		},
 		"defaultextclientdns": {
 			Type:     schema.TypeString,
@@ -356,21 +357,21 @@ func CreateNetworkFromSchemaData(d *schema.ResourceData) *Network {
 	network.Isipv6 = d.Get("isipv6").(string)
 	network.Isgrpchub = d.Get("isgrpchub").(string)
 	network.Localrange = d.Get("localrange").(string)
-	network.Checkininterval = d.Get("checkininterval").(int64)
+	network.Checkininterval = d.Get("checkininterval").(int)
 	network.Defaultudpholepunch = d.Get("defaultudpholepunch").(string)
 	network.Defaultextclientdns = d.Get("defaultextclientdns").(string)
-	network.Defaultmtu = d.Get("defaultmtu").(int64)
-	network.Defaultkeepalive = d.Get("defaultkeepalive").(int64)
+	network.Defaultmtu = d.Get("defaultmtu").(int)
+	network.Defaultkeepalive = d.Get("defaultkeepalive").(int)
 	network.Allowmanualsignup = d.Get("allowmanualsignup").(string)
-	network.Nodeslastmodified = d.Get("nodeslastmodified").(int64)
-	network.Networklastmodified = d.Get("networklastmodified").(int64)
+	network.Nodeslastmodified = d.Get("nodeslastmodified").(int)
+	network.Networklastmodified = d.Get("networklastmodified").(int)
 	network.Defaultinterface = d.Get("defaultinterface").(string)
-	network.Defaultlistenport = d.Get("defaultlistenport").(int64)
+	network.Defaultlistenport = d.Get("defaultlistenport").(int)
 	network.Defaultsaveconfig = d.Get("defaultsaveconfig").(string)
-	network.Nodelimit = d.Get("nodelimit").(int64)
+	network.Nodelimit = d.Get("nodelimit").(int)
 	network.Defaultpostup = d.Get("defaultpostup").(string)
 	network.Defaultpostdown = d.Get("defaultpostdown").(string)
-	network.Keyupdatetimestamp = d.Get("keyupdatetimestamp").(int64)
+	network.Keyupdatetimestamp = d.Get("keyupdatetimestamp").(int)
 	return network
 }
 

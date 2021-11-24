@@ -7,8 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccResourceScaffolding(t *testing.T) {
-	t.Skip("resource not yet implemented, remove this once you add your own code")
+func TestAccResourceNetwork(t *testing.T) {
+	// t.Skip("resource not yet implemented, remove this once you add your own code")
 
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -18,7 +18,7 @@ func TestAccResourceScaffolding(t *testing.T) {
 				Config: testAccResourceScaffolding,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"scaffolding_resource.foo", "sample_attribute", regexp.MustCompile("^ba")),
+						"netmaker_network.foo", "netid", regexp.MustCompile("^netmakertest")),
 				),
 			},
 		},
@@ -26,7 +26,13 @@ func TestAccResourceScaffolding(t *testing.T) {
 }
 
 const testAccResourceScaffolding = `
-resource "scaffolding_resource" "foo" {
-  sample_attribute = "bar"
+provider "netmaker" {
+	username = "admin"
+	password = "mx4S6JsSg7JWcZ"
+	host = "https://api.netmaker.madacluster.tech"
+}
+resource "netmaker_network" "foo" {
+  netid = "netmakertest"
+  addressrange = "10.100.10.0/24"
 }
 `
