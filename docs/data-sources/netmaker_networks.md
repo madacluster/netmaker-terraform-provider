@@ -25,7 +25,7 @@ terraform {
 provider "netmaker" {
   username = "admin"
   password = "mx4S6JsSg7JWcZ"
-  host     = "https://api.netmaker.madacluster.tech"
+  host     = "http://localhost:8081"
 }
 
 data "netmaker_networks" "example" {

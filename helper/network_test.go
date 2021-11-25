@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var host = "https://api.netmaker.madacluster.tech"
+var host = "http://localhost:8081"
 var pass = "mx4S6JsSg7JWcZ"
 var user = "admin"
 
@@ -39,7 +39,7 @@ func TestClient_CreateNetwork(t *testing.T) {
 		// TODO: Add test cases.
 		{"",
 			fields{
-				"https://api.netmaker.madacluster.tech",
+				"http://localhost:8081",
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{
@@ -104,7 +104,7 @@ func TestClient_GetNetworks(t *testing.T) {
 		// TODO: Add test cases.
 		{"",
 			fields{
-				"https://api.netmaker.madacluster.tech",
+				"http://localhost:8081",
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{
@@ -156,7 +156,7 @@ func TestClient_GetNetwork(t *testing.T) {
 		// TODO: Add test cases.
 		{"",
 			fields{
-				"https://api.netmaker.madacluster.tech",
+				"http://localhost:8081",
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{
@@ -217,7 +217,7 @@ func TestClient_UpdateNetwork(t *testing.T) {
 		// TODO: Add test cases.
 		{"",
 			fields{
-				"https://api.netmaker.madacluster.tech",
+				"http://localhost:8081",
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{
@@ -279,7 +279,7 @@ func TestClient_DeleteNetwork(t *testing.T) {
 		// TODO: Add test cases.
 		{"",
 			fields{
-				"https://api.netmaker.madacluster.tech",
+				"http://localhost:8081",
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{

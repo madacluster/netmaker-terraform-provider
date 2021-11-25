@@ -29,9 +29,11 @@ const testAccDataSourceNetwork = `
 provider "netmaker" {
 	username = "admin"
 	password = "mx4S6JsSg7JWcZ"
-	host = "https://api.netmaker.madacluster.tech"
-  }
+	host = "http://localhost:8081"
+}
 data "netmaker_network" "foo" {
 	id = "private"
+	netid = "private"
+	addressrange = "10.100.10.0/24"
 }
 `
