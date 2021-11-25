@@ -4,22 +4,9 @@ services:
   netmaker:
     container_name: netmaker
     image: gravitl/netmaker:v0.9.0
-    volumes:
-      # - /usr/bin/wg:/usr/bin/wg
-      - sqldata:/root/data
-    # cap_add: 
-    #   - NET_ADMIN
     restart: always
-    # privileged: true
     environment:
-      # SERVER_HOST: "SERVER_PUBLIC_IP"
-      # SERVER_API_CONN_STRING: "api.NETMAKER_BASE_DOMAIN:443"
-      # SERVER_GRPC_CONN_STRING: "grpc.NETMAKER_BASE_DOMAIN:443"
-      # COREDNS_ADDR: "SERVER_PUBLIC_IP"
-      # GRPC_SSL: "on"
       DNS_MODE: "off"
-      # SERVER_HTTP_HOST: "api.NETMAKER_BASE_DOMAIN"
-      # SERVER_GRPC_HOST: "grpc.NETMAKER_BASE_DOMAIN"
       API_PORT: "8081"
       GRPC_PORT: "50051"
       CLIENT_MODE: "on"
@@ -30,5 +17,3 @@ services:
       DATABASE: "sqlite"
     ports:
       - "8081:8081"
-volumes:
-  sqldata: {}
