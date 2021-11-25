@@ -48,7 +48,17 @@ func NewClient(host, username, password *string) (*Client, error) {
 	if host != nil {
 		c.HostURL = *host
 	}
-
+	admin, err := c.CheckAdmin()
+	if err != nil {
+		return nil, err
+	}
+	if !admin {
+		user := User{
+			UserName: *username,
+			Password: *password,
+		}
+		c.CreateAdmin(user)
+	}
 	ar, err := c.SignIn()
 	if err != nil {
 		return nil, err

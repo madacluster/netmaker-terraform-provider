@@ -39,13 +39,13 @@ func TestClient_CreateAdmin(t *testing.T) {
 					Password: pass,
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				HostURL:    tt.fields.HostURL,
+				HostURL:    "http://localhost:8081",
 				HTTPClient: tt.fields.HTTPClient,
 				Token:      tt.fields.Token,
 				Auth:       tt.fields.Auth,
@@ -195,7 +195,7 @@ func TestClient_DeleteUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c, _ := NewClient(&tt.fields.HostURL, &tt.fields.Auth.Username, &tt.fields.Auth.Password)
 
-			if err := c.DeleteUser(tt.args.user); (err != nil) != tt.wantErr {
+			if err := c.DeleteUser(tt.args.user.UserName); (err != nil) != tt.wantErr {
 				t.Errorf("Client.DeleteUser() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

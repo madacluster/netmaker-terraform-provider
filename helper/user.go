@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 type User struct {
 	UserName string   `json:"username"`
 	Password string   `json:"password"`
-	Network  []string `json:"network"`
+	Networks []string `json:"networks"`
 }
 
 func (c *Client) CreateAdmin(user User) error {
@@ -72,14 +74,9 @@ func (c *Client) CreateUser(user User) error {
 	return nil
 }
 
-func (c *Client) DeleteUser(user User) error {
+func (c *Client) DeleteUser(username string) error {
 
-	rb, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/users/%s", c.HostURL, user.UserName), strings.NewReader(string(rb)))
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/users/%s", c.HostURL, username), nil)
 	if err != nil {
 		return err
 	}
@@ -90,4 +87,97 @@ func (c *Client) DeleteUser(user User) error {
 	}
 	return nil
 
+}
+
+func (c *Client) UpdateUser(user User) error {
+	rb, err := json.Marshal(user)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/users/%s", c.HostURL, user.UserName), strings.NewReader(string(rb)))
+	if err != nil {
+		return err
+	}
+
+	_, err = c.doRequest(req)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreateUserSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"username": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"password": {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		"networks": {
+			Type:     schema.TypeList,
+			Computed: true,
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+	}
+}
+
+func (c *Client) GetUser(username string) (*User, error) {
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/users/%s", c.HostURL, username), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	user := User{}
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func CreateUserFromSchemaData(d *schema.ResourceData) *User {
+	user := &User{}
+	user.UserName = d.Get("username").(string)
+	user.Password = d.Get("password").(string)
+	networks := d.Get("network")
+	if networks != nil {
+		user.Networks = d.Get("network").([]string)
+	}
+
+	return user
+}
+
+func (c *Client) CreateUserFromSchema(d *schema.ResourceData) (*User, error) {
+	user := CreateUserFromSchemaData(d)
+	return user, c.CreateUser(*user)
+}
+
+func (c *Client) CreateAdminUserFromSchema(d *schema.ResourceData) (*User, error) {
+	user := CreateUserFromSchemaData(d)
+	return user, c.CreateAdmin(*user)
+}
+
+func SetUserSchemaData(d *schema.ResourceData, user *User) error {
+	d.Set("username", user.UserName)
+	d.Set("password", user.Password)
+	d.Set("network", user.Networks)
+	return nil
+}
+
+func (c *Client) UpdateUserFromSchema(d *schema.ResourceData) (*User, error) {
+	user := CreateUserFromSchemaData(d)
+	return user, c.UpdateUser(*user)
 }
