@@ -31,3 +31,22 @@ func (c *Client) CreateKey(networkID string, key models.AccessKey) (*models.Acce
 
 	return &key, nil
 }
+
+func (c *Client) GetKey(networkID string) ([]models.AccessKey, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/networks/%s/keys", c.HostURL, networkID), nil)
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var key []models.AccessKey
+	err = json.Unmarshal(body, &key)
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
