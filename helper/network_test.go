@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/gravitl/netmaker/models"
 )
 
 var host = "http://localhost:8081"
@@ -33,7 +35,7 @@ func TestClient_CreateNetwork(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *Network
+		want    *models.Network
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -56,9 +58,9 @@ func TestClient_CreateNetwork(t *testing.T) {
 				addressrange6:       "",
 				defaultudpholepunch: "yes",
 			},
-			&Network{
-				Addressrange: "10.101.10.0/24",
-				Netid:        "netmakertest",
+			&models.Network{
+				AddressRange: "10.101.10.0/24",
+				NetID:        "netmakertest",
 			},
 
 			false,
@@ -67,21 +69,21 @@ func TestClient_CreateNetwork(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, _ := NewClient(&tt.fields.HostURL, &tt.fields.Auth.Username, &tt.fields.Auth.Password)
-			network := &Network{
-				Addressrange:        tt.args.addressrange,
-				Localrange:          tt.args.localrange,
-				Islocal:             tt.args.islocal,
-				Isdualstack:         tt.args.isdualstack,
-				Addressrange6:       tt.args.addressrange6,
-				Defaultudpholepunch: tt.args.defaultudpholepunch,
-				Netid:               tt.args.networkID,
+			network := &models.Network{
+				AddressRange:        tt.args.addressrange,
+				LocalRange:          tt.args.localrange,
+				IsLocal:             tt.args.islocal,
+				IsDualStack:         tt.args.isdualstack,
+				AddressRange6:       tt.args.addressrange6,
+				DefaultUDPHolePunch: tt.args.defaultudpholepunch,
+				NetID:               tt.args.networkID,
 			}
 			got, err := c.CreateNetwork(*network)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateNetwork() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got.Netid, tt.want.Netid) {
+			if !reflect.DeepEqual(got.NetID, tt.want.NetID) {
 				t.Errorf("Client.CreateNetwork() = %v, want %v", got, tt.want)
 			}
 		})
@@ -98,7 +100,7 @@ func TestClient_GetNetworks(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		want    []Network
+		want    []models.Network
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -112,10 +114,10 @@ func TestClient_GetNetworks(t *testing.T) {
 					"mx4S6JsSg7JWcZ",
 				},
 			},
-			[]Network{
+			[]models.Network{
 				{
-					Addressrange: ipRange,
-					Netid:        "netmakertest",
+					AddressRange: ipRange,
+					NetID:        "netmakertest",
 				},
 			},
 			false,
@@ -129,7 +131,7 @@ func TestClient_GetNetworks(t *testing.T) {
 				t.Errorf("Client.GetNetworks() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got[0].Netid, tt.want[0].Netid) {
+			if !reflect.DeepEqual(got[0].NetID, tt.want[0].NetID) {
 				t.Errorf("Client.GetNetworks() = %v, want %v", got, tt.want)
 			}
 		})
@@ -150,7 +152,7 @@ func TestClient_GetNetwork(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *Network
+		want    *models.Network
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -165,12 +167,12 @@ func TestClient_GetNetwork(t *testing.T) {
 				},
 			},
 			args{networkID: "netmakertest"},
-			&Network{
-				Addressrange:        "10.101.10.0/24",
-				Netid:               "netmakertest",
-				Defaultudpholepunch: "yes",
-				Isdualstack:         "no",
-				Islocal:             "no",
+			&models.Network{
+				AddressRange:        "10.101.10.0/24",
+				NetID:               "netmakertest",
+				DefaultUDPHolePunch: "yes",
+				IsDualStack:         "no",
+				IsLocal:             "no",
 			},
 
 			false,
@@ -185,7 +187,7 @@ func TestClient_GetNetwork(t *testing.T) {
 				t.Errorf("Client.GetNetwork() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got.Addressrange, tt.want.Addressrange) {
+			if !reflect.DeepEqual(got.AddressRange, tt.want.AddressRange) {
 				t.Errorf("Client.GetNetwork() = %v, want %v", got, tt.want)
 			}
 		})
@@ -211,7 +213,7 @@ func TestClient_UpdateNetwork(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *Network
+		want    *models.Network
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -231,10 +233,10 @@ func TestClient_UpdateNetwork(t *testing.T) {
 					"addressrange": "10.102.0.0/24",
 				},
 			},
-			&Network{
-				Addressrange: "10.102.0.0/24",
-				Netid:        "netmakertest",
-				Displayname:  "netmakertest",
+			&models.Network{
+				AddressRange: "10.102.0.0/24",
+				NetID:        "netmakertest",
+				DisplayName:  "netmakertest",
 			},
 
 			false,
@@ -253,7 +255,7 @@ func TestClient_UpdateNetwork(t *testing.T) {
 				t.Errorf("Client.UpdateNetwork() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got.Displayname, tt.want.Displayname) {
+			if !reflect.DeepEqual(got.DisplayName, tt.want.DisplayName) {
 				t.Errorf("Client.UpdateNetwork() = %v, want %v", got, tt.want)
 			}
 		})

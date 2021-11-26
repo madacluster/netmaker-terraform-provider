@@ -3,12 +3,12 @@
 page_title: "netmaker_network Data Source - netmaker-terraform-provider"
 subcategory: ""
 description: |-
-  Network Data source in the Terraform provider Netmaker.
+  models.Network Data source in the Terraform provider Netmaker.
 ---
 
 # netmaker_network (Data Source)
 
-Network Data source in the Terraform provider Netmaker.
+models.Network Data source in the Terraform provider Netmaker.
 
 
 

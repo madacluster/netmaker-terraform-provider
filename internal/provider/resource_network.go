@@ -43,7 +43,7 @@ func resourceNetworkCreate(ctx context.Context, d *schema.ResourceData, meta int
 	if err != nil {
 		return diag.Errorf("failed to create network: %s", err)
 	}
-	d.SetId(network.Netid)
+	d.SetId(network.NetID)
 	return diags
 
 }
