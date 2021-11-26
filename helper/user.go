@@ -114,12 +114,15 @@ func CreateUserSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 		"password": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type: schema.TypeString,
+			// Computed:  true,
+			Sensitive: true,
+			Optional:  true,
 		},
 		"networks": {
 			Type:     schema.TypeList,
 			Computed: true,
+			Optional: true,
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
@@ -155,6 +158,8 @@ func CreateUserFromSchemaData(d *schema.ResourceData) *User {
 	networks := d.Get("network")
 	if networks != nil {
 		user.Networks = d.Get("network").([]string)
+	} else {
+		user.Networks = []string{}
 	}
 
 	return user

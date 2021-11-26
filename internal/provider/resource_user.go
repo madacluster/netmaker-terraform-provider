@@ -64,7 +64,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, meta interf
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
 	// UserID := d.Id()
-	if d.HasChangesExcept("last_updated") {
+	if d.HasChangesExcept("password") {
 		_, err := client.UpdateUserFromSchema(d)
 		if err != nil {
 			return diag.FromErr(err)
