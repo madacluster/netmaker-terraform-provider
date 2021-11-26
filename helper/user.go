@@ -6,16 +6,17 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gravitl/netmaker/models"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-type User struct {
-	UserName string   `json:"username"`
-	Password string   `json:"password"`
-	Networks []string `json:"networks"`
-}
+// type models.User struct {
+// 	UserName string   `json:"username"`
+// 	Password string   `json:"password"`
+// 	Networks []string `json:"networks"`
+// }
 
-func (c *Client) CreateAdmin(user User) error {
+func (c *Client) CreateAdmin(user models.User) error {
 
 	rb, err := json.Marshal(user)
 	if err != nil {
@@ -55,7 +56,7 @@ func (c *Client) CheckAdmin() (bool, error) {
 	return admin, nil
 }
 
-func (c *Client) CreateUser(user User) error {
+func (c *Client) CreateUser(user models.User) error {
 
 	rb, err := json.Marshal(user)
 	if err != nil {
@@ -89,7 +90,7 @@ func (c *Client) DeleteUser(username string) error {
 
 }
 
-func (c *Client) UpdateUser(user User) error {
+func (c *Client) UpdateUser(user models.User) error {
 	rb, err := json.Marshal(user)
 	if err != nil {
 		return err
@@ -114,8 +115,7 @@ func CreateUserSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 		"password": {
-			Type: schema.TypeString,
-			// Computed:  true,
+			Type:      schema.TypeString,
 			Sensitive: true,
 			Optional:  true,
 		},
@@ -130,7 +130,7 @@ func CreateUserSchema() map[string]*schema.Schema {
 	}
 }
 
-func (c *Client) GetUser(username string) (*User, error) {
+func (c *Client) GetUser(username string) (*models.User, error) {
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/users/%s", c.HostURL, username), nil)
 	if err != nil {
@@ -142,7 +142,7 @@ func (c *Client) GetUser(username string) (*User, error) {
 		return nil, err
 	}
 
-	user := User{}
+	user := models.User{}
 	err = json.Unmarshal(body, &user)
 	if err != nil {
 		return nil, err
@@ -151,8 +151,8 @@ func (c *Client) GetUser(username string) (*User, error) {
 	return &user, nil
 }
 
-func CreateUserFromSchemaData(d *schema.ResourceData) *User {
-	user := &User{}
+func CreateUserFromSchemaData(d *schema.ResourceData) *models.User {
+	user := &models.User{}
 	user.UserName = d.Get("username").(string)
 	user.Password = d.Get("password").(string)
 	networks := d.Get("network")
@@ -165,24 +165,23 @@ func CreateUserFromSchemaData(d *schema.ResourceData) *User {
 	return user
 }
 
-func (c *Client) CreateUserFromSchema(d *schema.ResourceData) (*User, error) {
+func (c *Client) CreateUserFromSchema(d *schema.ResourceData) (*models.User, error) {
 	user := CreateUserFromSchemaData(d)
 	return user, c.CreateUser(*user)
 }
 
-func (c *Client) CreateAdminUserFromSchema(d *schema.ResourceData) (*User, error) {
+func (c *Client) CreateAdminUserFromSchema(d *schema.ResourceData) (*models.User, error) {
 	user := CreateUserFromSchemaData(d)
 	return user, c.CreateAdmin(*user)
 }
 
-func SetUserSchemaData(d *schema.ResourceData, user *User) error {
+func SetUserSchemaData(d *schema.ResourceData, user *models.User) error {
 	d.Set("username", user.UserName)
-	d.Set("password", user.Password)
 	d.Set("network", user.Networks)
 	return nil
 }
 
-func (c *Client) UpdateUserFromSchema(d *schema.ResourceData) (*User, error) {
+func (c *Client) UpdateUserFromSchema(d *schema.ResourceData) (*models.User, error) {
 	user := CreateUserFromSchemaData(d)
 	return user, c.UpdateUser(*user)
 }

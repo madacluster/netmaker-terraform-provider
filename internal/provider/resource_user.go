@@ -29,12 +29,12 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, meta interf
 	var diags diag.Diagnostics
 
 	client := meta.(*helper.Client)
-	User, err := client.CreateUserFromSchema(d)
+	user, err := client.CreateUserFromSchema(d)
 
 	if err != nil {
-		return diag.Errorf("failed to create User: %s", err)
+		return diag.Errorf("failed to create models.User: %s", err)
 	}
-	d.SetId(User.UserName)
+	d.SetId(user.UserName)
 	return diags
 
 }
@@ -49,12 +49,12 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	User, err := client.GetUser(UserID)
+	user, err := client.GetUser(UserID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	if helper.SetUserSchemaData(d, User) != nil {
+	if helper.SetUserSchemaData(d, user) != nil {
 		return diag.FromErr(err)
 	}
 	return diags

@@ -3,6 +3,8 @@ package helper
 import (
 	"net/http"
 	"testing"
+
+	"github.com/gravitl/netmaker/models"
 )
 
 func TestClient_CreateAdmin(t *testing.T) {
@@ -13,7 +15,7 @@ func TestClient_CreateAdmin(t *testing.T) {
 		Auth       AuthStruct
 	}
 	type args struct {
-		user User
+		user models.User
 	}
 	tests := []struct {
 		name    string
@@ -34,7 +36,7 @@ func TestClient_CreateAdmin(t *testing.T) {
 				},
 			},
 			args: args{
-				user: User{
+				user: models.User{
 					UserName: "admin_test",
 					Password: pass,
 				},
@@ -114,7 +116,7 @@ func TestClient_CreateUser(t *testing.T) {
 		Auth       AuthStruct
 	}
 	type args struct {
-		user User
+		user models.User
 	}
 	tests := []struct {
 		name    string
@@ -135,7 +137,7 @@ func TestClient_CreateUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: User{
+				user: models.User{
 					UserName: "user_test",
 					Password: pass,
 				},
@@ -162,7 +164,7 @@ func TestClient_DeleteUser(t *testing.T) {
 		Auth       AuthStruct
 	}
 	type args struct {
-		user User
+		user models.User
 	}
 	tests := []struct {
 		name    string
@@ -183,7 +185,7 @@ func TestClient_DeleteUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: User{
+				user: models.User{
 					UserName: "user_test",
 					Password: pass,
 				},
