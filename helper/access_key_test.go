@@ -27,7 +27,29 @@ func TestClient_CreateKey(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
-
+		{
+			name: "Create admin user",
+			fields: fields{
+				HostURL:    host,
+				HTTPClient: &http.Client{},
+				Token:      "",
+				Auth: AuthStruct{
+					Username: user,
+					Password: pass,
+				},
+			},
+			args: args{
+				networkID: "netmakertest",
+				key: models.AccessKey{
+					Name: "test",
+					Uses: 10,
+				},
+			},
+			want: &models.AccessKey{
+				Name: "test",
+				Uses: 10,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -37,7 +59,7 @@ func TestClient_CreateKey(t *testing.T) {
 				t.Errorf("Client.CreateKey() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got.Name, tt.want.Name) {
 				t.Errorf("Client.CreateKey() = %v, want %v", got, tt.want)
 			}
 		})

@@ -2,6 +2,7 @@ package helper
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -14,7 +15,7 @@ func (c *Client) CreateKey(networkID string, key models.AccessKey) (*models.Acce
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", c.HostURL+"/api/networks/", strings.NewReader(string(rb)))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/networks/%s/keys", c.HostURL, networkID), strings.NewReader(string(rb)))
 	if err != nil {
 		return nil, err
 	}
