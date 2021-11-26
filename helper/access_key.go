@@ -50,3 +50,16 @@ func (c *Client) GetKey(networkID string) ([]models.AccessKey, error) {
 
 	return key, nil
 }
+
+func (c *Client) DeleteKey(networkID string, keyID string) error {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/networks/%s/keys/%s", c.HostURL, networkID, keyID), nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.doRequest(req)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

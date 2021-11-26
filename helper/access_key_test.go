@@ -84,7 +84,7 @@ func TestClient_GetKey(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name: "Create admin user",
+			name: "Get admin user",
 			fields: fields{
 				HostURL:    host,
 				HTTPClient: &http.Client{},
@@ -112,6 +112,52 @@ func TestClient_GetKey(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got[0].Name, tt.want.Name) {
 				t.Errorf("Client.GetKey() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClient_DeleteKey(t *testing.T) {
+	type fields struct {
+		HostURL    string
+		HTTPClient *http.Client
+		Token      string
+		Auth       AuthStruct
+	}
+	type args struct {
+		networkID string
+		keyID     string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+
+		{
+			name: "Create admin user",
+			fields: fields{
+				HostURL:    host,
+				HTTPClient: &http.Client{},
+				Auth: AuthStruct{
+					Username: user,
+					Password: pass,
+				},
+			},
+			args: args{
+				networkID: "netmakertest",
+				keyID:     "test",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, _ := NewClient(&tt.fields.HostURL, &tt.fields.Auth.Username, &tt.fields.Auth.Password)
+
+			if err := c.DeleteKey(tt.args.networkID, tt.args.keyID); (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
