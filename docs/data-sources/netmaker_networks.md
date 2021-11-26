@@ -33,7 +33,7 @@ data "netmaker_networks" "example" {
 }
 
 output "networks" {
-  value = "${data.netmaker_networks.example.networks}"
+  value = data.netmaker_networks.example.networks
 }
 ```
 
@@ -72,11 +72,8 @@ Read-Only:
 - **isipv4** (String)
 - **isipv6** (String)
 - **islocal** (String)
-- **keyupdatetimestamp** (Number)
 - **localrange** (String)
 - **netid** (String)
-- **networklastmodified** (Number)
 - **nodelimit** (Number)
-- **nodeslastmodified** (Number)
 
 

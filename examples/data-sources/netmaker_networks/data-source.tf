@@ -18,5 +18,5 @@ data "netmaker_networks" "example" {
 }
 
 output "networks" {
-  value = "${data.netmaker_networks.example.networks}"
+  value = data.netmaker_networks.example.networks
 }

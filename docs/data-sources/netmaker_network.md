@@ -41,10 +41,7 @@ models.Network Data source in the Terraform provider Netmaker.
 - **isipv4** (String)
 - **isipv6** (String)
 - **islocal** (String)
-- **keyupdatetimestamp** (Number)
 - **localrange** (String)
-- **networklastmodified** (Number)
 - **nodelimit** (Number)
-- **nodeslastmodified** (Number)
 
 
