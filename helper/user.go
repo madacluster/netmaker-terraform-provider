@@ -10,12 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-// type models.User struct {
-// 	UserName string   `json:"username"`
-// 	Password string   `json:"password"`
-// 	Networks []string `json:"networks"`
-// }
-
 func (c *Client) CreateAdmin(user models.User) error {
 
 	rb, err := json.Marshal(user)

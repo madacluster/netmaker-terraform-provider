@@ -18,7 +18,7 @@ func TestAccDataSourceNetworks(t *testing.T) {
 				Config: testAccDataSourceNetworks,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"data.netmaker_networks.foo", "networks.0.netid", regexp.MustCompile("^private")),
+						"data.netmaker_networks.foo", "networks.0.netid", regexp.MustCompile("^netmakertest")),
 				),
 			},
 		},
