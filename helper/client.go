@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/gravitl/netmaker/models"
 )
 
 // AuthStruct -
@@ -48,7 +50,17 @@ func NewClient(host, username, password *string) (*Client, error) {
 	if host != nil {
 		c.HostURL = *host
 	}
-
+	admin, err := c.CheckAdmin()
+	if err != nil {
+		return nil, err
+	}
+	if !admin {
+		user := models.User{
+			UserName: *username,
+			Password: *password,
+		}
+		c.CreateAdmin(user)
+	}
 	ar, err := c.SignIn()
 	if err != nil {
 		return nil, err

@@ -7,33 +7,37 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourceNetwork(t *testing.T) {
-	// t.Skip("data source not yet implemented, remove this once you add your own code")
+func TestAccResourceUser(t *testing.T) {
+	// t.Skip("resource not yet implemented, remove this once you add your own code")
 
 	resource.UnitTest(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSourceNetwork,
+				Config: testAccResourceAdminUser,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"data.netmaker_network.foo", "netid", regexp.MustCompile("^private")),
+						"netmaker_user.foo", "username", regexp.MustCompile("^netmakertes")),
 				),
 			},
 		},
 	})
 }
 
-const testAccDataSourceNetwork = `
+const testAccResourceAdminUser = `
 provider "netmaker" {
 	username = "admin"
 	password = "mx4S6JsSg7JWcZ"
-	host = "http://localhost:8081"
+	host 	 = "http://localhost:8081"
 }
-data "netmaker_network" "foo" {
-	id = "private"
-	netid = "private"
+resource "netmaker_network" "foo" {
+	netid = "netmakertes"
 	addressrange = "10.100.10.0/24"
+  }
+resource "netmaker_user" "foo" {
+  username = "netmakertes"
+  password = "netmaker"
+  networks = ["netmakertes"]
 }
 `

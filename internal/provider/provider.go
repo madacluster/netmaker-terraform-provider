@@ -33,6 +33,7 @@ func New(version string) func() *schema.Provider {
 			},
 			ResourcesMap: map[string]*schema.Resource{
 				"netmaker_network": resourceNetwork(),
+				"netmaker_user":    resourceUser(),
 			},
 			Schema: map[string]*schema.Schema{
 				"username": {
@@ -63,7 +64,7 @@ func New(version string) func() *schema.Provider {
 
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
-		// Setup a User-Agent for your API client (replace the provider name for yours):
+		// Setup a models.User-Agent for your API client (replace the provider name for yours):
 		// userAgent := p.UserAgent("terraform-provider-scaffolding", version)
 		// TODO: myClient.UserAgent = userAgent
 		username := d.Get("username").(string)

@@ -22,7 +22,7 @@ func AddIdNetworkSchema() map[string]*schema.Schema {
 func dataSourceNetwork() *schema.Resource {
 	return &schema.Resource{
 		// This description is used by the documentation generator and the language server.
-		Description: "Network Data source in the Terraform provider Netmaker.",
+		Description: "models.Network Data source in the Terraform provider Netmaker.",
 
 		ReadContext: dataSourceNetworkRead,
 

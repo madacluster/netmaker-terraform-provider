@@ -24,7 +24,7 @@ func TestClient_SignIn(t *testing.T) {
 		// TODO: Add test cases.
 		{"",
 			fields{
-				"https://api.netmaker.madacluster.tech",
+				"http://localhost:8081",
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{

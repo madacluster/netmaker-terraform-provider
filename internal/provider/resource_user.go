@@ -9,72 +9,63 @@ import (
 	"github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
-func addLastupdated(s map[string]*schema.Schema) map[string]*schema.Schema {
-	s["last_updated"] = &schema.Schema{
-		Type:     schema.TypeString,
-		Computed: true,
-		Optional: true,
-	}
-	return s
-}
-
-func resourceNetwork() *schema.Resource {
+func resourceUser() *schema.Resource {
 	return &schema.Resource{
 		// This description is used by the documentation generator and the language server.
 		Description: "Sample resource in the Terraform provider scaffolding.",
 
-		CreateContext: resourceNetworkCreate,
-		ReadContext:   resourceNetworkRead,
-		UpdateContext: resourceNetworkUpdate,
-		DeleteContext: resourceNetworkDelete,
+		CreateContext: resourceUserCreate,
+		ReadContext:   resourceUserRead,
+		UpdateContext: resourceUserUpdate,
+		DeleteContext: resourceUserDelete,
 
-		Schema: addLastupdated(helper.CreateNetworkSchema()),
+		Schema: addLastupdated(helper.CreateUserSchema()),
 	}
 }
 
-func resourceNetworkCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceUserCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	// client := meta.(*apiClient)
 	var diags diag.Diagnostics
 
 	client := meta.(*helper.Client)
-	network, err := client.CreateNetworkFromSchema(d)
+	user, err := client.CreateUserFromSchema(d)
 
 	if err != nil {
-		return diag.Errorf("failed to create network: %s", err)
+		return diag.Errorf("failed to create models.User: %s", err)
 	}
-	d.SetId(network.NetID)
+	d.SetId(user.UserName)
 	return diags
 
 }
 
-func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceUserRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
-	networkID := d.Id()
+	UserID := d.Id()
 
-	// d.SetId(networkID)
+	// d.SetId(UserID)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	network, err := client.GetNetwork(networkID)
+	user, err := client.GetUser(UserID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	if helper.SetNetworkSchemaData(d, network) != nil {
+	if helper.SetUserSchemaData(d, user) != nil {
 		return diag.FromErr(err)
 	}
 	return diags
 }
 
-func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
-	// networkID := d.Id()
-	if d.HasChangesExcept("last_updated") {
-		_, err := client.UpdateNetworkFromSchema(d)
+	// UserID := d.Id()
+	if d.HasChangesExcept("password") {
+		_, err := client.UpdateUserFromSchema(d)
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -82,17 +73,17 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, meta int
 
 	}
 
-	return resourceNetworkRead(ctx, d, meta)
+	return resourceUserRead(ctx, d, meta)
 }
 
-func resourceNetworkDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceUserDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	// client := meta.(*apiClient)
 	client := meta.(*helper.Client)
 	var diags diag.Diagnostics
 
-	networkID := d.Id()
-	err := client.DeleteNetwork(networkID)
+	UserID := d.Id()
+	err := client.DeleteUser(UserID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
