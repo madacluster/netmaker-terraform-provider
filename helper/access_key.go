@@ -10,6 +10,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+func (c *Client) CreateAccessKeyFromSchema(d *schema.ResourceData, netID string) (*models.AccessKey, error) {
+	key := CreateAccessKeyFromSchema(d)
+	return c.CreateKey(netID, *key)
+}
+
 func (c *Client) CreateKey(networkID string, key models.AccessKey) (*models.AccessKey, error) {
 	rb, err := json.Marshal(key)
 	if err != nil {
@@ -32,7 +37,13 @@ func (c *Client) CreateKey(networkID string, key models.AccessKey) (*models.Acce
 
 	return &key, nil
 }
-
+func CreateAccessKeyFromSchema(d *schema.ResourceData) *models.AccessKey {
+	return &models.AccessKey{
+		Name:         d.Get("name").(string),
+		AccessString: d.Get("key").(string),
+		Uses:         d.Get("uses").(int),
+	}
+}
 func (c *Client) GetKeys(networkID string) ([]models.AccessKey, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/networks/%s/keys", c.HostURL, networkID), nil)
 	if err != nil {
@@ -78,7 +89,7 @@ func (c *Client) DeleteKey(networkID string, keyID string) error {
 	return nil
 }
 
-func CreateAccessKeyDataSchema() map[string]*schema.Schema {
+func CreateAccessKeySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
 			Type:        schema.TypeString,
@@ -89,6 +100,7 @@ func CreateAccessKeyDataSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Required:    true,
 			Description: "Name of the access key",
+			ForceNew:    true,
 		},
 		"key": {
 			Type:        schema.TypeString,
@@ -96,18 +108,42 @@ func CreateAccessKeyDataSchema() map[string]*schema.Schema {
 			Description: "Key of the access key",
 		},
 		"uses": {
-			Type:        schema.TypeInt,
-			Computed:    true,
+			Type: schema.TypeInt,
+			// Computed:    true,
+			Required:    true,
 			Description: "Uses of the access key",
 		},
 	}
 }
 
-func SetAccessKeySchemaData(d *schema.ResourceData, key *models.AccessKey) error {
-	// d.SetId(key.ID)
-	// d.Set("name", key.Name)
-	// d.Set("key", key.Key)
-	// d.Set("uses", key.Uses)
+func SetAccessKeySchemaData(d *schema.ResourceData, key *models.AccessKey, netID string) error {
+	ID := fmt.Sprintf("%s-%s", netID, key.Name)
+	d.SetId(ID)
+	d.Set("name", key.Name)
+	d.Set("key", key.AccessString)
+	d.Set("uses", key.Uses)
+	return nil
+}
+
+func (c *Client) UpdateKey(networkID string, key models.AccessKey) error {
+	rb, err := json.Marshal(key)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/api/networks/%s/keyupdate", c.HostURL, networkID), strings.NewReader(string(rb)))
+	if err != nil {
+		return err
+	}
+	_, err = c.doRequest(req)
+	if err != nil {
+		return err
+	}
 
 	return nil
+}
+
+func (c *Client) UpdateKeyFromSchema(d *schema.ResourceData, netID string) error {
+	key := CreateAccessKeyFromSchema(d)
+	return c.UpdateKey(netID, *key)
 }
