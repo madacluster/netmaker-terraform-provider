@@ -28,8 +28,9 @@ func New(version string) func() *schema.Provider {
 	return func() *schema.Provider {
 		p := &schema.Provider{
 			DataSourcesMap: map[string]*schema.Resource{
-				"netmaker_networks": dataSourceNetworks(),
-				"netmaker_network":  dataSourceNetwork(),
+				"netmaker_networks":   dataSourceNetworks(),
+				"netmaker_network":    dataSourceNetwork(),
+				"netmaker_access_key": dataSourceAccessKey(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
 				"netmaker_network": resourceNetwork(),

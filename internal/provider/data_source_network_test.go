@@ -18,7 +18,7 @@ func TestAccDataSourceNetwork(t *testing.T) {
 				Config: testAccDataSourceNetwork,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"data.netmaker_network.foo", "netid", regexp.MustCompile("^private")),
+						"data.netmaker_network.foo", "netid", regexp.MustCompile("^netmakertest")),
 				),
 			},
 		},
@@ -32,8 +32,7 @@ provider "netmaker" {
 	host = "http://localhost:8081"
 }
 data "netmaker_network" "foo" {
-	id = "private"
-	netid = "private"
+	netid = "netmakertest"
 	addressrange = "10.100.10.0/24"
 }
 `

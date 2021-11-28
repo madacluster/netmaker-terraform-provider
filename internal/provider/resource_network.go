@@ -34,7 +34,6 @@ func resourceNetwork() *schema.Resource {
 
 func resourceNetworkCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
-	// client := meta.(*apiClient)
 	var diags diag.Diagnostics
 
 	client := meta.(*helper.Client)
@@ -53,8 +52,6 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta inter
 	client := meta.(*helper.Client)
 	networkID := d.Id()
 
-	// d.SetId(networkID)
-
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
@@ -72,7 +69,6 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta inter
 func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
-	// networkID := d.Id()
 	if d.HasChangesExcept("last_updated") {
 		_, err := client.UpdateNetworkFromSchema(d)
 		if err != nil {

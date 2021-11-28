@@ -45,8 +45,8 @@ func TestClient_CreateNetwork(t *testing.T) {
 				&http.Client{Timeout: 10 * time.Second},
 				"",
 				AuthStruct{
-					"admin",
-					"mx4S6JsSg7JWcZ",
+					user,
+					pass,
 				},
 			},
 			args{
