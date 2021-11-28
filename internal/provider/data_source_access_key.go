@@ -11,7 +11,7 @@ import (
 )
 
 func AddIdAccessKeySchema() map[string]*schema.Schema {
-	result := helper.CreateAccessKeyDataSchema()
+	result := helper.CreateAccessKeySchema()
 	result["id"] = &schema.Schema{
 		Type:     schema.TypeString,
 		Required: true,
@@ -26,7 +26,7 @@ func dataSourceAccessKey() *schema.Resource {
 
 		ReadContext: dataSourceAccessKeyRead,
 
-		Schema: helper.CreateAccessKeyDataSchema(),
+		Schema: helper.CreateAccessKeySchema(),
 	}
 }
 
@@ -34,16 +34,16 @@ func dataSourceAccessKeyRead(ctx context.Context, d *schema.ResourceData, meta i
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
 	accessKeyID := d.Get("name").(string)
-	keyName := d.Get("netid").(string)
+	netID := d.Get("netid").(string)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	key, err := client.GetKey(accessKeyID, keyName)
+	key, err := client.GetKey(accessKeyID, netID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = helper.SetAccessKeySchemaData(d, key)
+	err = helper.SetAccessKeySchemaData(d, key, netID)
 
 	if err != nil {
 		return diag.FromErr(err)
