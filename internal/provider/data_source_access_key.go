@@ -10,32 +10,40 @@ import (
 	"github.com/madacluster/netmaker-terraform-provider/helper"
 )
 
-func dataSourceNetwork() *schema.Resource {
+func AddIdAccessKeySchema() map[string]*schema.Schema {
+	result := helper.CreateAccessKeyDataSchema()
+	result["id"] = &schema.Schema{
+		Type:     schema.TypeString,
+		Required: true,
+	}
+	return result
+}
+
+func dataSourceAccessKey() *schema.Resource {
 	return &schema.Resource{
 		// This description is used by the documentation generator and the language server.
-		Description: "models.Network Data source in the Terraform provider Netmaker.",
+		Description: "AccessKey Data source in the Terraform provider Netmaker.",
 
-		ReadContext: dataSourceNetworkRead,
+		ReadContext: dataSourceAccessKeyRead,
 
-		Schema: helper.CreateNetworkSchema(),
+		Schema: helper.CreateAccessKeyDataSchema(),
 	}
 }
 
-func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceAccessKeyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// use the meta value to retrieve your client from the provider configure method
 	client := meta.(*helper.Client)
-	networkID := d.Get("netid").(string)
-	// idFromAPI := "my-id"
-	// d.SetId(idFromAPI)
+	accessKeyID := d.Get("name").(string)
+	keyName := d.Get("netid").(string)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	network, err := client.GetNetwork(networkID)
+	key, err := client.GetKey(accessKeyID, keyName)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = helper.SetNetworkSchemaData(d, network)
+	err = helper.SetAccessKeySchemaData(d, key)
 
 	if err != nil {
 		return diag.FromErr(err)

@@ -73,7 +73,8 @@ func TestClient_GetKey(t *testing.T) {
 		Auth       AuthStruct
 	}
 	type args struct {
-		networkID string
+		networkID  string
+		accesKeyID string
 	}
 	tests := []struct {
 		name    string
@@ -94,7 +95,8 @@ func TestClient_GetKey(t *testing.T) {
 				},
 			},
 			args: args{
-				networkID: "netmakertest",
+				networkID:  "netmakertest",
+				accesKeyID: "test",
 			},
 			want: &models.AccessKey{
 				Name: "test",
@@ -105,13 +107,48 @@ func TestClient_GetKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, _ := NewClient(&tt.fields.HostURL, &tt.fields.Auth.Username, &tt.fields.Auth.Password)
-			got, err := c.GetKey(tt.args.networkID)
+			got, err := c.GetKey(tt.args.networkID, tt.args.accesKeyID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.GetKey() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got[0].Name, tt.want.Name) {
+			if !reflect.DeepEqual(got.Name, tt.want.Name) {
 				t.Errorf("Client.GetKey() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClient_GetKeys(t *testing.T) {
+	type fields struct {
+		HostURL    string
+		HTTPClient *http.Client
+		Token      string
+		Auth       AuthStruct
+	}
+	type args struct {
+		networkID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []models.AccessKey
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, _ := NewClient(&tt.fields.HostURL, &tt.fields.Auth.Username, &tt.fields.Auth.Password)
+
+			got, err := c.GetKeys(tt.args.networkID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.GetKeys() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got[0].Name, tt.want[0].Name) {
+				t.Errorf("Client.GetKeys() = %v, want %v", got, tt.want)
 			}
 		})
 	}
