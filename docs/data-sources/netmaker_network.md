@@ -18,8 +18,11 @@ models.Network Data source in the Terraform provider Netmaker.
 ### Required
 
 - **addressrange** (String)
-- **id** (String) The ID of this resource.
 - **netid** (String)
+
+### Optional
+
+- **id** (String) The ID of this resource.
 
 ### Read-Only
 
