@@ -46,11 +46,11 @@ func CreateTestData(t *testing.T, createNode bool) {
 		Uses: 10,
 	}
 	accessKey, err := c.CreateKey(got.NetID, *key)
-	token = accessKey.Value
 	// token = accessKey.
 	if err != nil {
 		t.Fatal(err)
 	}
+	token = accessKey.Value
 	if createNode {
 		node := models.Node{
 			AccessKey: token,
