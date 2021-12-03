@@ -77,7 +77,7 @@ func (c *Client) DeleteNetworkNode(networkID, mac string) error {
 }
 
 func (c *Client) GetNode(networkID, mac string) (models.Node, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/nodes/%s", c.HostURL, networkID), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/nodes/%s/%s", c.HostURL, networkID, mac), nil)
 	if err != nil {
 		return models.Node{}, err
 	}

@@ -205,7 +205,6 @@ func TestClient_GetNetworkNodes(t *testing.T) {
 		want    []models.Node
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "Get Nodes Network",
 			fields: fields{
@@ -216,31 +215,33 @@ func TestClient_GetNetworkNodes(t *testing.T) {
 					Password: pass,
 				},
 			},
+			args: args{
+				networkID: net_id,
+			},
 			want:    []models.Node{},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				HostURL:    tt.fields.HostURL,
-				HTTPClient: tt.fields.HTTPClient,
-				Token:      tt.fields.Token,
-				Auth:       tt.fields.Auth,
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
 			}
 			got, err := c.GetNetworkNodes(tt.args.networkID)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.GetNetworkNodes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Client.GetNodes() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.GetNetworkNodes() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got[0].Name, "testnode") {
+				t.Errorf("Client.GetNodes() = %v, want %v", got[0].Name, "testnode")
 			}
 		})
 	}
 }
 
 func TestClient_GetNode(t *testing.T) {
+	CreateTestData(t, true)
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -258,22 +259,31 @@ func TestClient_GetNode(t *testing.T) {
 		want    models.Node
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:   "Get Node",
+			fields: fields{},
+			args: args{
+				networkID: net_id,
+				mac:       node_mac,
+			},
+			want: models.Node{
+				Name: node_id,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				HostURL:    tt.fields.HostURL,
-				HTTPClient: tt.fields.HTTPClient,
-				Token:      tt.fields.Token,
-				Auth:       tt.fields.Auth,
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
 			}
 			got, err := c.GetNode(tt.args.networkID, tt.args.mac)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.GetNode() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got.Name, tt.want.Name) {
 				t.Errorf("Client.GetNode() = %v, want %v", got, tt.want)
 			}
 		})
