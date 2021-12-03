@@ -265,6 +265,21 @@ func CreateEgressSchema() map[string]*schema.Schema {
 	}
 }
 
+func CreateIngressSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"mac": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The MAC address of the node",
+		},
+		"netid": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The ID of the network the node belongs to",
+		},
+	}
+}
+
 func CreateEgressFromSchema(d *schema.ResourceData) *models.EgressGatewayRequest {
 
 	tfRanges := d.Get("ranges").(*schema.Set).List()
@@ -288,4 +303,10 @@ func SetEgressSchemaData(d *schema.ResourceData, node *models.Node, networkID, m
 	d.Set("mac", mac)
 	d.Set("netid", node.Network)
 	d.Set("interface", node.Interface)
+}
+
+func SetIngressSchemaData(d *schema.ResourceData, node *models.Node, networkID, mac string) {
+	d.SetId(node.ID)
+	d.Set("mac", mac)
+	d.Set("netid", node.Network)
 }

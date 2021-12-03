@@ -38,6 +38,7 @@ func New(version string) func() *schema.Provider {
 				"netmaker_user":       resourceUser(),
 				"netmaker_access_key": resourceAccessKey(),
 				"netmaker_egress":     resourceEgress(),
+				"netmaker_ingress":    resourceIngress(),
 			},
 			Schema: map[string]*schema.Schema{
 				"username": {
