@@ -388,6 +388,7 @@ func TestClient_CreateIngress(t *testing.T) {
 }
 
 func TestClient_DeleteIngress(t *testing.T) {
+	CreateTestData(t, true)
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -405,23 +406,36 @@ func TestClient_DeleteIngress(t *testing.T) {
 		want    *models.Node
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:   "Delete Ingress",
+			fields: fields{},
+			args: args{
+				networkID: net_id,
+				mac:       node_mac,
+			},
+			want: &models.Node{
+				Name: node_id,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				HostURL:    tt.fields.HostURL,
-				HTTPClient: tt.fields.HTTPClient,
-				Token:      tt.fields.Token,
-				Auth:       tt.fields.Auth,
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
+			}
+			_, err = c.CreateIngress(tt.args.networkID, tt.args.mac)
+			if err != nil {
+				t.Errorf("Create Ingress() error = %v", err)
 			}
 			got, err := c.DeleteIngress(tt.args.networkID, tt.args.mac)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.DeleteIngress() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.DeleteIngress() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got.Name, tt.want.Name) {
+				t.Errorf("Client.DeleteIngress() = %v, want %v", got.Name, tt.want.Name)
 			}
 		})
 	}
