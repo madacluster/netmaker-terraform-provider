@@ -236,3 +236,56 @@ func SetNodeSchemaData(d *schema.ResourceData, node *models.Node, networkID stri
 	d.Set("is_ingress_gateway", node.IsIngressGateway)
 	d.Set("is_egress_gateway", node.IsEgressGateway)
 }
+
+func CreateEgressSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"mac": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The MAC address of the node",
+		},
+		"netid": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The ID of the network the node belongs to",
+		},
+		"interface": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			ForceNew:    true,
+			Description: "The interface the node is connected to",
+		},
+		"ranges": {
+			Type:        schema.TypeSet,
+			Optional:    true,
+			Description: "The ranges the node is allowed to access",
+			ForceNew:    true,
+			Elem:        &schema.Schema{Type: schema.TypeString},
+		},
+	}
+}
+
+func CreateEgressFromSchema(d *schema.ResourceData) *models.EgressGatewayRequest {
+
+	tfRanges := d.Get("ranges").(*schema.Set).List()
+	ranges := make([]string, len(tfRanges))
+	for i, tfTag := range tfRanges {
+		ranges[i] = tfTag.(string)
+	}
+	return &models.EgressGatewayRequest{
+		Interface: d.Get("interface").(string),
+		Ranges:    ranges,
+	}
+}
+
+func (c *Client) CreateEgressFromSchema(d *schema.ResourceData, netID, mac string) (*models.Node, error) {
+	egress := CreateEgressFromSchema(d)
+	return c.CreateEgress(netID, mac, egress)
+}
+
+func SetEgressSchemaData(d *schema.ResourceData, node *models.Node, networkID, mac string) {
+	d.SetId(node.ID)
+	d.Set("mac", mac)
+	d.Set("netid", node.Network)
+	d.Set("interface", node.Interface)
+}
