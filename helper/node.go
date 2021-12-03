@@ -157,8 +157,12 @@ func (c *Client) GetNetworkEgress(networkID string) ([]models.Node, error) {
 	return filter, nil
 }
 
-func (c *Client) CreateEgress(networkID, mac string) (*models.Node, error) {
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/nodes/%s/%s/creategateway", c.HostURL, networkID, mac), nil)
+func (c *Client) CreateEgress(networkID, mac string, gateway *models.EgressGatewayRequest) (*models.Node, error) {
+	rb, err := json.Marshal(gateway)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/nodes/%s/%s/creategateway", c.HostURL, networkID, mac), strings.NewReader(string(rb)))
 	if err != nil {
 		return nil, err
 	}

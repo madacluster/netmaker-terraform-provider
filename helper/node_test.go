@@ -442,6 +442,7 @@ func TestClient_DeleteIngress(t *testing.T) {
 }
 
 func TestClient_CreateEgress(t *testing.T) {
+	CreateTestData(t, true)
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -451,6 +452,7 @@ func TestClient_CreateEgress(t *testing.T) {
 	type args struct {
 		networkID string
 		mac       string
+		egress    *models.EgressGatewayRequest
 	}
 	tests := []struct {
 		name    string
@@ -464,6 +466,11 @@ func TestClient_CreateEgress(t *testing.T) {
 			fields: fields{},
 			args: args{
 				networkID: net_id,
+				mac:       node_mac,
+				egress: &models.EgressGatewayRequest{
+					Interface: "eth0",
+					Ranges:    []string{"0.0.0.0./0"},
+				},
 			},
 			want: &models.Node{
 				Name: node_id,
@@ -477,12 +484,12 @@ func TestClient_CreateEgress(t *testing.T) {
 			if err != nil {
 				t.Errorf("Client.NetClient() error = %v", err)
 			}
-			got, err := c.CreateEgress(tt.args.networkID, tt.args.mac)
+			got, err := c.CreateEgress(tt.args.networkID, tt.args.mac, tt.args.egress)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateEgress() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got.Name, tt.want.Name) {
 				t.Errorf("Client.CreateEgress() = %v, want %v", got, tt.want)
 			}
 		})
@@ -490,6 +497,7 @@ func TestClient_CreateEgress(t *testing.T) {
 }
 
 func TestClient_GetNetworkEgress(t *testing.T) {
+	CreateTestData(t, true)
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -503,7 +511,7 @@ func TestClient_GetNetworkEgress(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    []models.Node
+		want    string
 		wantErr bool
 	}{
 		{
@@ -512,9 +520,13 @@ func TestClient_GetNetworkEgress(t *testing.T) {
 			args: args{
 				networkID: net_id,
 			},
-			want:    []models.Node{},
+			want:    "yes",
 			wantErr: false,
 		},
+	}
+	egress := &models.EgressGatewayRequest{
+		Interface: "eth0",
+		Ranges:    []string{"0.0.0.0./0"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -522,13 +534,16 @@ func TestClient_GetNetworkEgress(t *testing.T) {
 			if err != nil {
 				t.Errorf("Client.NetClient() error = %v", err)
 			}
-
+			_, err = c.CreateEgress(tt.args.networkID, node_mac, egress)
+			if err != nil {
+				t.Errorf("Create Egress error = %v", err)
+			}
 			got, err := c.GetNetworkEgress(tt.args.networkID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.GetNetworkEgress() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got[0].IsEgressGateway, tt.want) {
 				t.Errorf("Client.GetNetworkEgress() = %v, want %v", got, tt.want)
 			}
 		})
@@ -536,6 +551,7 @@ func TestClient_GetNetworkEgress(t *testing.T) {
 }
 
 func TestClient_DeleteEgress(t *testing.T) {
+	CreateTestData(t, true)
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -553,23 +569,81 @@ func TestClient_DeleteEgress(t *testing.T) {
 		want    *models.Node
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:   "Delete Network Egress",
+			fields: fields{},
+			args: args{
+				networkID: net_id,
+				mac:       node_mac,
+			},
+			want: &models.Node{
+				Name: node_id,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				HostURL:    tt.fields.HostURL,
-				HTTPClient: tt.fields.HTTPClient,
-				Token:      tt.fields.Token,
-				Auth:       tt.fields.Auth,
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
+			}
+			egress := &models.EgressGatewayRequest{
+				Interface: "eth0",
+				Ranges:    []string{"0.0.0.0./0"},
+			}
+			_, err = c.CreateEgress(tt.args.networkID, tt.args.mac, egress)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
 			}
 			got, err := c.DeleteEgress(tt.args.networkID, tt.args.mac)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.DeleteEgress() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got.Name, tt.want.Name) {
 				t.Errorf("Client.DeleteEgress() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClient_DeleteNetworkNode(t *testing.T) {
+	CreateTestData(t, true)
+	type fields struct {
+		HostURL    string
+		HTTPClient *http.Client
+		Token      string
+		Auth       AuthStruct
+	}
+	type args struct {
+		networkID string
+		mac       string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "Delete Network Node",
+			fields: fields{},
+			args: args{
+				networkID: net_id,
+				mac:       node_mac,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
+			}
+			if err := c.DeleteNetworkNode(tt.args.networkID, tt.args.mac); (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteNetworkNode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
