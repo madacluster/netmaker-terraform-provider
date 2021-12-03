@@ -8,10 +8,17 @@ import (
 	"github.com/gravitl/netmaker/models"
 )
 
-func CreateTestData() (*string, error) {
+var token string
+
+const node_id = "testnode"
+const net_id = "test"
+const key_name = "test"
+const node_mac = "01:02:03:04:05:06"
+
+func CreateTestData(t *testing.T, createNode bool) {
 	c, err := NewClient(&host, &user, &pass)
 	if err != nil {
-		return nil, err
+		t.Fatal(err)
 	}
 
 	network := &models.Network{
@@ -21,27 +28,63 @@ func CreateTestData() (*string, error) {
 		IsDualStack:         "",
 		AddressRange6:       "",
 		DefaultUDPHolePunch: "yes",
-		NetID:               "test2",
+		NetID:               net_id,
 	}
 	got, err := c.CreateNetwork(*network)
 	if err != nil {
-		return nil, err
+		t.Fatal(err)
 	}
 	key := &models.AccessKey{
-		Name: "test",
+		Name: key_name,
 		Uses: 10,
 	}
 	accessKey, err := c.CreateKey(got.NetID, *key)
+	token = accessKey.Value
+	// token = accessKey.
 	if err != nil {
-		return nil, err
+		t.Fatal(err)
 	}
-	return &accessKey.Value, nil
+	if createNode {
+		node := models.Node{
+			AccessKey: token,
+			PublicKey: "DM5qhLAE20PG9BbfBCger+Ac9D2NDOwCtY1rbYDLf34=", Name: node_id, Endpoint: "10.0.0.1", MacAddress: node_mac, Password: "password", Network: net_id,
+		}
+		_, err := c.CreateNetworkNode(network.NetID, node)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Cleanup(func() {
+		err := CleanTestData()
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func CleanTestData() error {
+	c, err := NewClient(&host, &user, &pass)
+	if err != nil {
+		return err
+	}
+	err = c.DeleteNetworkNode(net_id, node_mac)
+	if err != nil {
+		return err
+	}
+	err = c.DeleteKey(net_id, key_name)
+	if err != nil {
+		return err
+	}
+	return c.DeleteNetwork(net_id)
 }
 func TestClient_CreateNetworkNode(t *testing.T) {
-	key, err := CreateTestData()
-	if err != nil {
-		t.Errorf("Client.CreateNetworkNode() error = %v", err)
+	CreateTestData(t, false)
+	// if err != nil {
+	// 	t.Errorf("Client.CreateNetworkNode() error = %v", err)
 
+	node := models.Node{
+		AccessKey: token,
+		PublicKey: "DM5qhLAE20PG9BbfBCger+Ac9D2NDOwCtY1rbYDLf34=", Name: node_id, Endpoint: "10.0.0.1", MacAddress: node_mac, Password: "password", Network: net_id,
 	}
 	type fields struct {
 		HostURL    string
@@ -60,7 +103,6 @@ func TestClient_CreateNetworkNode(t *testing.T) {
 		want    *models.Node
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 
 			name: "Create Network Node",
@@ -73,36 +115,33 @@ func TestClient_CreateNetworkNode(t *testing.T) {
 				},
 			},
 			args: args{
-				networkID: "test2",
-				node: models.Node{
-
-					AccessKey: *key,
-					PublicKey: "DM5qhLAE20PG9BbfBCger+Ac9D2NDOwCtY1rbYDLf34=", Name: "testnode", Endpoint: "10.0.0.1", MacAddress: "01:02:03:04:05:06", Password: "password", Network: "skynet",
-				},
+				networkID: net_id,
+				node:      node,
 			},
+			want:    &node,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				HostURL:    tt.fields.HostURL,
-				HTTPClient: tt.fields.HTTPClient,
-				Token:      tt.fields.Token,
-				Auth:       tt.fields.Auth,
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.CreateNetworkNode() error = %v", err)
 			}
 			got, err := c.CreateNetworkNode(tt.args.networkID, tt.args.node)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateNetworkNode() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.CreateNetworkNode() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got.Network, net_id) {
+				t.Errorf("Client.CreateNetworkNode() = %v, want %v", got.Network, net_id)
 			}
 		})
 	}
 }
 
 func TestClient_GetNodes(t *testing.T) {
+	CreateTestData(t, true)
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -115,7 +154,6 @@ func TestClient_GetNodes(t *testing.T) {
 		want    []models.Node
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "Get Nodes",
 			fields: fields{
@@ -132,25 +170,25 @@ func TestClient_GetNodes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				HostURL:    tt.fields.HostURL,
-				HTTPClient: tt.fields.HTTPClient,
-				Token:      tt.fields.Token,
-				Auth:       tt.fields.Auth,
+			c, err := NewClient(&host, &user, &pass)
+			if err != nil {
+				t.Errorf("Client.NetClient() error = %v", err)
 			}
 			got, err := c.GetNodes()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.GetNodes() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.GetNodes() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got[0].Name, "testnode") {
+				t.Errorf("Client.GetNodes() = %v, want %v", got[0].Name, "testnode")
 			}
 		})
 	}
 }
 
 func TestClient_GetNetworkNodes(t *testing.T) {
+	CreateTestData(t, true)
+
 	type fields struct {
 		HostURL    string
 		HTTPClient *http.Client
@@ -168,6 +206,19 @@ func TestClient_GetNetworkNodes(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+		{
+			name: "Get Nodes Network",
+			fields: fields{
+				HostURL:    host,
+				HTTPClient: &http.Client{},
+				Auth: AuthStruct{
+					Username: user,
+					Password: pass,
+				},
+			},
+			want:    []models.Node{},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
