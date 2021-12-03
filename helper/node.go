@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gravitl/netmaker/models"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func (c *Client) GetNodes() ([]models.Node, error) {
@@ -76,19 +77,19 @@ func (c *Client) DeleteNetworkNode(networkID, mac string) error {
 	return nil
 }
 
-func (c *Client) GetNode(networkID, mac string) (models.Node, error) {
+func (c *Client) GetNode(networkID, mac string) (*models.Node, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/nodes/%s/%s", c.HostURL, networkID, mac), nil)
 	if err != nil {
-		return models.Node{}, err
+		return nil, err
 	}
 	body, err := c.doRequest(req)
 	if err != nil {
-		return models.Node{}, err
+		return nil, err
 	}
-	node := models.Node{}
-	err = json.Unmarshal(body, &node)
+	node := &models.Node{}
+	err = json.Unmarshal(body, node)
 	if err != nil {
-		return models.Node{}, err
+		return nil, err
 	}
 	return node, nil
 }
@@ -195,4 +196,43 @@ func (c *Client) DeleteEgress(networkID, mac string) (*models.Node, error) {
 		return nil, err
 	}
 	return node, nil
+}
+
+func CreateNodeDataSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "The name of the node",
+		},
+		"mac": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The MAC address of the node",
+		},
+		"network_id": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "The ID of the network the node belongs to",
+		},
+		"is_ingress_gateway": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Is the node an ingress gateway",
+		},
+		"is_egress_gateway": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Is the node an egress gateway",
+		},
+	}
+}
+
+func SetNodeSchemaData(d *schema.ResourceData, node *models.Node, networkID string) {
+	d.SetId(node.ID)
+	d.Set("name", node.Name)
+	d.Set("mac", node.MacAddress)
+	d.Set("network_id", node.Network)
+	d.Set("is_ingress_gateway", node.IsIngressGateway)
+	d.Set("is_egress_gateway", node.IsEgressGateway)
 }
